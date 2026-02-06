@@ -66,7 +66,8 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     EmailProvider({
-      server: {}, // Not used with custom sendVerificationRequest
+      // Server not used - we use custom sendVerificationRequest with Brevo API
+      server: "smtp://not-used",
       from: process.env.EMAIL_FROM || "noreply@sdl-app.de",
       sendVerificationRequest,
     }),
