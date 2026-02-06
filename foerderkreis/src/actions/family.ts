@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { familyCreateSchema, familyJoinSchema } from "@/lib/validations";
-import { Prisma } from "@prisma/client";
 
 type TransactionClient = Omit<typeof prisma, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
 
