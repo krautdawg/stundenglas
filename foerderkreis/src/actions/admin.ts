@@ -73,7 +73,7 @@ export async function getExportData() {
 
   // Build family hours map
   const familyHours: Record<string, number> = {};
-  hours.forEach((h) => {
+  hours.forEach((h: { familyId: string; hours: unknown }) => {
     familyHours[h.familyId] = (familyHours[h.familyId] || 0) + Number(h.hours);
   });
 
