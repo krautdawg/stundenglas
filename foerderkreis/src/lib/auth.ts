@@ -3,25 +3,57 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import EmailProvider from "next-auth/providers/email";
 import { prisma } from "@/lib/prisma";
 import type { NextAuthOptions } from "next-auth";
+import { createTransport } from "nodemailer";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     EmailProvider({
-      server: {
-        host: process.env.EMAIL_SERVER_HOST,
-        port: Number(process.env.EMAIL_SERVER_PORT) || 587,
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
-        },
-      },
+      server: {},
       from: process.env.EMAIL_FROM || "noreply@sdl-app.de",
+      async sendVerificationRequest({ identifier: email, url }) {
+        const BREVO_API_KEY = process.env.BREVO_API_KEY;
+        const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@sdl-app.de";
+
+        if (!BREVO_API_KEY) {
+          throw new Error("BREVO_API_KEY not set");
+        }
+
+        const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "api-key": BREVO_API_KEY,
+          },
+          body: JSON.stringify({
+            sender: { name: "Schule des Lebens", email: FROM_EMAIL },
+            to: [{ email }],
+            subject: "Dein Login-Link",
+            htmlContent: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2>Login bei Schule des Lebens</h2>
+                <p>Klicke hier zum Einloggen:</p>
+                <p style="margin: 30px 0;">
+                  <a href="${url}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+                    Einloggen
+                  </a>
+                </p>
+                <p style="color: #666; font-size: 14px;">Link: <a href="${url}">${url}</a></p>
+              </div>
+            `,
+          }),
+        });
+
+        if (!res.ok) {
+          const err = await res.text();
+          console.error("Brevo error:", err);
+          throw new Error("Failed to send email via Brevo");
+        }
+      },
     }),
   ],
-  session: {
-    strategy: "database",
-  },
+  session: { strategy: "database" },
   pages: {
     signIn: "/login",
     verifyRequest: "/login/verify",
@@ -33,13 +65,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = user.id;
         const fullUser = await prisma.user.findUnique({
           where: { id: user.id },
-          select: {
-            role: true,
-            familyId: true,
-            firstName: true,
-            lastName: true,
-            onboardingCompleted: true,
-          },
+          select: { role: true, familyId: true, firstName: true, lastName: true, onboardingCompleted: true },
         });
         if (fullUser) {
           session.user.role = fullUser.role;
