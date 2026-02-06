@@ -18,6 +18,15 @@ export const authOptions: NextAuthOptions = {
           throw new Error("BREVO_API_KEY not set");
         }
 
+        const htmlContent = `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+          <h2>Login bei Schule des Lebens</h2>
+          <p>Klicke hier zum Einloggen:</p>
+          <p style="margin:30px 0">
+            <a href="${url}" style="background:#2563eb;color:white;padding:12px 24px;text-decoration:none;border-radius:6px">Einloggen</a>
+          </p>
+          <p style="color:#666;font-size:14px">Link: <a href="${url}">${url}</a></p>
+        </div>`;
+
         const res = await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
           headers: {
@@ -29,14 +38,7 @@ export const authOptions: NextAuthOptions = {
             sender: { name: "Schule des Lebens", email: FROM_EMAIL },
             to: [{ email }],
             subject: "Dein Login-Link",
-            htmlContent: \`<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-              <h2>Login bei Schule des Lebens</h2>
-              <p>Klicke hier zum Einloggen:</p>
-              <p style="margin:30px 0">
-                <a href="\${url}" style="background:#2563eb;color:white;padding:12px 24px;text-decoration:none;border-radius:6px">Einloggen</a>
-              </p>
-              <p style="color:#666;font-size:14px">Link: <a href="\${url}">\${url}</a></p>
-            </div>\`,
+            htmlContent,
           }),
         });
 
@@ -51,7 +53,7 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "database" },
   pages: {
     signIn: "/login",
-    verifyRequest: "/login/verify", 
+    verifyRequest: "/login/verify",
     error: "/login/error",
   },
   callbacks: {
