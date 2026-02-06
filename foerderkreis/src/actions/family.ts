@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { familyCreateSchema, familyJoinSchema } from "@/lib/validations";
+import { Prisma } from "@prisma/client";
+
+type TransactionClient = Omit<typeof prisma, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
 
 export async function createFamily(formData: FormData) {
   const session = await auth();
@@ -19,7 +22,7 @@ export async function createFamily(formData: FormData) {
 
   try {
     // Create family and link user in a transaction
-    const family = await prisma.$transaction(async (tx) => {
+    const family = await prisma.$transaction(async (tx: TransactionClient) => {
       const newFamily = await tx.family.create({
         data: { name: parsed.data.name },
       });

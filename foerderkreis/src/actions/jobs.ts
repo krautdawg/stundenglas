@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { jobSchema } from "@/lib/validations";
-import { JobStatus, JobUrgency } from "@prisma/client";
+import { JobUrgency } from "@prisma/client";
+
+type TransactionClient = Omit<typeof prisma, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
 
 export async function createJob(formData: FormData) {
   const session = await auth();
@@ -83,7 +85,7 @@ export async function claimJob(jobId: string) {
   }
 
   try {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: TransactionClient) => {
       await tx.jobClaim.create({
         data: {
           jobId,
@@ -127,7 +129,7 @@ export async function completeJobClaim(jobId: string) {
   if (!job) return { error: "Aufgabe nicht gefunden" };
 
   try {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: TransactionClient) => {
       // Update claim status
       await tx.jobClaim.updateMany({
         where: { jobId, userId: session.user.id },
@@ -174,7 +176,7 @@ export async function withdrawClaim(jobId: string) {
   if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
   try {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: TransactionClient) => {
       await tx.jobClaim.updateMany({
         where: { jobId, userId: session.user.id, status: "CLAIMED" },
         data: { status: "WITHDRAWN" },
