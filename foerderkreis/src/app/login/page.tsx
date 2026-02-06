@@ -51,9 +51,6 @@ export default function LoginPage() {
           <h1 className="text-2xl font-heading font-extrabold text-foreground">
             Schule des Lebens
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Foerderkreis &middot; Kloster Lehnin
-          </p>
         </div>
 
         <Card>
