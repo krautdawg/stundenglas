@@ -1,25 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { logHoursSchema } from "@/lib/validations";
 
 export async function logHours(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Nicht angemeldet" };
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
   // Get user's family
-  const { data: profile } = await supabase
-    .from("users")
-    .select("family_id")
-    .eq("id", user.id)
-    .single();
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { familyId: true },
+  });
 
-  if (!profile?.family_id) {
+  if (!user?.familyId) {
     return { error: "Du gehoerst noch keiner Familie an" };
   }
 
@@ -35,16 +31,20 @@ export async function logHours(formData: FormData) {
     return { error: parsed.error.issues[0].message };
   }
 
-  const { error } = await supabase.from("volunteer_hours").insert({
-    user_id: user.id,
-    family_id: profile.family_id,
-    kreis_id: parsed.data.kreis_id,
-    hours: parsed.data.hours,
-    description: parsed.data.description,
-    date_performed: parsed.data.date_performed,
-  });
-
-  if (error) return { error: "Stunden konnten nicht erfasst werden" };
+  try {
+    await prisma.volunteerHour.create({
+      data: {
+        userId: session.user.id,
+        familyId: user.familyId,
+        kreisId: parsed.data.kreis_id || null,
+        hours: parsed.data.hours,
+        description: parsed.data.description,
+        datePerformed: new Date(parsed.data.date_performed),
+      },
+    });
+  } catch {
+    return { error: "Stunden konnten nicht erfasst werden" };
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/hours");
@@ -53,12 +53,8 @@ export async function logHours(formData: FormData) {
 }
 
 export async function updateHours(id: string, formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Nicht angemeldet" };
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
   const raw = {
     date_performed: formData.get("date_performed") as string,
@@ -72,18 +68,22 @@ export async function updateHours(id: string, formData: FormData) {
     return { error: parsed.error.issues[0].message };
   }
 
-  const { error } = await supabase
-    .from("volunteer_hours")
-    .update({
-      hours: parsed.data.hours,
-      description: parsed.data.description,
-      date_performed: parsed.data.date_performed,
-      kreis_id: parsed.data.kreis_id,
-    })
-    .eq("id", id)
-    .eq("user_id", user.id);
-
-  if (error) return { error: "Eintrag konnte nicht aktualisiert werden" };
+  try {
+    await prisma.volunteerHour.updateMany({
+      where: {
+        id,
+        userId: session.user.id,
+      },
+      data: {
+        hours: parsed.data.hours,
+        description: parsed.data.description,
+        datePerformed: new Date(parsed.data.date_performed),
+        kreisId: parsed.data.kreis_id || null,
+      },
+    });
+  } catch {
+    return { error: "Eintrag konnte nicht aktualisiert werden" };
+  }
 
   revalidatePath("/hours");
   revalidatePath("/dashboard");
@@ -91,20 +91,19 @@ export async function updateHours(id: string, formData: FormData) {
 }
 
 export async function deleteHours(id: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
-  if (!user) return { error: "Nicht angemeldet" };
-
-  const { error } = await supabase
-    .from("volunteer_hours")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", user.id);
-
-  if (error) return { error: "Eintrag konnte nicht geloescht werden" };
+  try {
+    await prisma.volunteerHour.deleteMany({
+      where: {
+        id,
+        userId: session.user.id,
+      },
+    });
+  } catch {
+    return { error: "Eintrag konnte nicht geloescht werden" };
+  }
 
   revalidatePath("/hours");
   revalidatePath("/dashboard");

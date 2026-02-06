@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,46 +9,45 @@ import { ArrowLeft } from "lucide-react";
 import { FamilyAdminActions } from "./family-actions";
 
 export default async function AdminFamiliesPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session!.user.id;
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user!.id)
-    .single();
+  const profile = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
 
-  if (profile?.role !== "admin") redirect("/dashboard");
+  if (profile?.role !== "ADMIN") redirect("/dashboard");
 
-  const { data: families } = await supabase
-    .from("families")
-    .select("*")
-    .order("name");
+  const families = await prisma.family.findMany({
+    orderBy: { name: "asc" },
+  });
 
   // Get hours per family this year
   const startOfYear = new Date();
   startOfYear.setMonth(0, 1);
+  startOfYear.setHours(0, 0, 0, 0);
 
-  const { data: hours } = await supabase
-    .from("volunteer_hours")
-    .select("family_id, hours")
-    .gte("date_performed", startOfYear.toISOString().split("T")[0]);
+  const hours = await prisma.volunteerHour.findMany({
+    where: {
+      datePerformed: { gte: startOfYear },
+    },
+    select: { familyId: true, hours: true },
+  });
 
   const hoursMap: Record<string, number> = {};
-  hours?.forEach((h) => {
-    hoursMap[h.family_id] = (hoursMap[h.family_id] || 0) + Number(h.hours);
+  hours.forEach((h) => {
+    hoursMap[h.familyId] = (hoursMap[h.familyId] || 0) + Number(h.hours);
   });
 
   // Get member count per family
-  const { data: users } = await supabase
-    .from("users")
-    .select("family_id");
+  const users = await prisma.user.findMany({
+    select: { familyId: true },
+  });
 
   const memberMap: Record<string, number> = {};
-  users?.forEach((u) => {
-    if (u.family_id) memberMap[u.family_id] = (memberMap[u.family_id] || 0) + 1;
+  users.forEach((u) => {
+    if (u.familyId) memberMap[u.familyId] = (memberMap[u.familyId] || 0) + 1;
   });
 
   return (
@@ -61,13 +61,13 @@ export default async function AdminFamiliesPage() {
         <div>
           <h1 className="text-2xl font-heading font-extrabold">Familien</h1>
           <p className="text-muted-foreground">
-            {families?.length} Familien registriert
+            {families.length} Familien registriert
           </p>
         </div>
       </div>
 
       <div className="space-y-2">
-        {families?.map((family) => (
+        {families.map((family) => (
           <Card key={family.id}>
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
@@ -76,7 +76,7 @@ export default async function AdminFamiliesPage() {
                   <div className="text-sm text-muted-foreground">
                     {memberMap[family.id] || 0} Mitglieder &middot; Code:{" "}
                     <code className="text-xs bg-muted px-1 rounded">
-                      {family.invite_code}
+                      {family.inviteCode}
                     </code>
                   </div>
                   <div className="text-sm mt-1">
@@ -84,7 +84,7 @@ export default async function AdminFamiliesPage() {
                       {(hoursMap[family.id] || 0).toFixed(1)}h
                     </span>{" "}
                     <span className="text-muted-foreground">
-                      / Ziel: {Number(family.monthly_hour_target)}h/Monat
+                      / Ziel: {Number(family.monthlyHourTarget)}h/Monat
                     </span>
                   </div>
                   {family.notes && (
@@ -94,10 +94,10 @@ export default async function AdminFamiliesPage() {
                   )}
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  {!family.is_active && (
+                  {!family.isActive && (
                     <Badge variant="destructive">Inaktiv</Badge>
                   )}
-                  {family.monthly_hour_target !== 10 && (
+                  {Number(family.monthlyHourTarget) !== 10 && (
                     <Badge variant="secondary" className="text-xs">
                       Angepasstes Ziel
                     </Badge>
@@ -106,9 +106,9 @@ export default async function AdminFamiliesPage() {
               </div>
               <FamilyAdminActions
                 familyId={family.id}
-                currentTarget={Number(family.monthly_hour_target)}
+                currentTarget={Number(family.monthlyHourTarget)}
                 currentNotes={family.notes || ""}
-                isActive={family.is_active}
+                isActive={family.isActive}
               />
             </CardContent>
           </Card>

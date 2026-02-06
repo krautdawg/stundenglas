@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -6,22 +7,23 @@ import { ProfileForm } from "./profile-form";
 import { SignOutButton } from "./sign-out-button";
 
 export default async function ProfilePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session!.user.id;
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("*, families(name, invite_code)")
-    .eq("id", user!.id)
-    .single();
+  const profile = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      family: { select: { name: true, inviteCode: true } },
+    },
+  });
 
   // Get user's Kreise
-  const { data: memberships } = await supabase
-    .from("kreis_memberships")
-    .select("role, kreise(name, slug, icon)")
-    .eq("user_id", user!.id);
+  const memberships = await prisma.kreisMembership.findMany({
+    where: { userId },
+    include: {
+      kreis: { select: { name: true, slug: true, icon: true } },
+    },
+  });
 
   return (
     <div className="space-y-6">
@@ -30,16 +32,16 @@ export default async function ProfilePage() {
       {/* Avatar & Name */}
       <div className="text-center">
         <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-200 to-amber-400 mx-auto flex items-center justify-center text-2xl font-heading font-bold text-white mb-3">
-          {profile?.first_name?.[0] || "?"}
-          {profile?.last_name?.[0] || ""}
+          {profile?.firstName?.[0] || "?"}
+          {profile?.lastName?.[0] || ""}
         </div>
         <h2 className="text-xl font-heading font-bold">
-          {profile?.first_name} {profile?.last_name}
+          {profile?.firstName} {profile?.lastName}
         </h2>
         <p className="text-sm text-muted-foreground">{profile?.email}</p>
-        {profile?.families && (
+        {profile?.family && (
           <Badge variant="secondary" className="mt-2">
-            {(profile.families as { name: string }).name}
+            {profile.family.name}
           </Badge>
         )}
       </div>
@@ -51,24 +53,17 @@ export default async function ProfilePage() {
         <div>
           <h3 className="font-heading font-bold mb-2">Meine Kreise</h3>
           <div className="flex gap-2 flex-wrap">
-            {memberships.map((m) => {
-              const kreis = m.kreise as unknown as {
-                name: string;
-                slug: string;
-                icon: string;
-              };
-              return (
-                <Badge key={kreis.slug} variant="secondary">
-                  {kreis.icon} {kreis.name}
-                </Badge>
-              );
-            })}
+            {memberships.map((m) => (
+              <Badge key={m.kreis.slug} variant="secondary">
+                {m.kreis.icon} {m.kreis.name}
+              </Badge>
+            ))}
           </div>
         </div>
       )}
 
       {/* Family invite code */}
-      {profile?.families && (
+      {profile?.family && (
         <Card>
           <CardContent className="p-4">
             <h3 className="font-heading font-bold text-sm mb-1">
@@ -79,7 +74,7 @@ export default async function ProfilePage() {
             </p>
             <div className="bg-muted rounded-lg p-3 text-center">
               <code className="text-lg font-bold tracking-widest">
-                {(profile.families as { invite_code: string }).invite_code}
+                {profile.family.inviteCode}
               </code>
             </div>
           </CardContent>
@@ -91,11 +86,11 @@ export default async function ProfilePage() {
       {/* Edit Profile Form */}
       <ProfileForm
         initialData={{
-          first_name: profile?.first_name || "",
-          last_name: profile?.last_name || "",
+          first_name: profile?.firstName || "",
+          last_name: profile?.lastName || "",
           bio: profile?.bio || "",
-          skill_tags: profile?.skill_tags || [],
-          privacy_mode: profile?.privacy_mode || false,
+          skill_tags: profile?.skillTags || [],
+          privacy_mode: profile?.privacyMode || false,
         }}
       />
 

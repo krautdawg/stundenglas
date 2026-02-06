@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,74 +10,74 @@ import {
   Clock,
   Briefcase,
   AlertTriangle,
-  Download,
   Flag,
 } from "lucide-react";
 import { ExportCSVButton } from "./export-csv-button";
 
 export default async function AdminDashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session!.user.id;
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user!.id)
-    .single();
+  const profile = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
 
-  if (profile?.role !== "admin") redirect("/dashboard");
+  if (profile?.role !== "ADMIN") redirect("/dashboard");
 
   // Stats
-  const { count: totalFamilies } = await supabase
-    .from("families")
-    .select("*", { count: "exact", head: true })
-    .eq("is_active", true);
+  const totalFamilies = await prisma.family.count({
+    where: { isActive: true },
+  });
 
-  const { count: openJobs } = await supabase
-    .from("jobs")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "open");
+  const openJobs = await prisma.job.count({
+    where: { status: "OPEN" },
+  });
 
-  const { count: flaggedEntries } = await supabase
-    .from("volunteer_hours")
-    .select("*", { count: "exact", head: true })
-    .eq("flagged", true);
+  const flaggedEntries = await prisma.volunteerHour.count({
+    where: { flagged: true },
+  });
 
   // Hours this month
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
-  const { data: monthHours } = await supabase
-    .from("volunteer_hours")
-    .select("hours")
-    .gte("date_performed", startOfMonth.toISOString().split("T")[0]);
+  startOfMonth.setHours(0, 0, 0, 0);
 
-  const totalHoursThisMonth =
-    monthHours?.reduce((sum, h) => sum + Number(h.hours), 0) ?? 0;
+  const monthHoursResult = await prisma.volunteerHour.aggregate({
+    where: {
+      datePerformed: { gte: startOfMonth },
+    },
+    _sum: { hours: true },
+  });
+
+  const totalHoursThisMonth = Number(monthHoursResult._sum.hours ?? 0);
 
   // Inactive families (0 hours this month)
-  const { data: allFamilies } = await supabase
-    .from("families")
-    .select("id, name")
-    .eq("is_active", true);
+  const allFamilies = await prisma.family.findMany({
+    where: { isActive: true },
+    select: { id: true, name: true },
+  });
 
-  const { data: activeHours } = await supabase
-    .from("volunteer_hours")
-    .select("family_id")
-    .gte("date_performed", startOfMonth.toISOString().split("T")[0]);
+  const activeHours = await prisma.volunteerHour.findMany({
+    where: {
+      datePerformed: { gte: startOfMonth },
+    },
+    select: { familyId: true },
+  });
 
-  const activeFamilyIds = new Set(activeHours?.map((h) => h.family_id));
-  const inactiveFamilies =
-    allFamilies?.filter((f) => !activeFamilyIds.has(f.id)) ?? [];
+  const activeFamilyIds = new Set(activeHours.map((h) => h.familyId));
+  const inactiveFamilies = allFamilies.filter((f) => !activeFamilyIds.has(f.id));
 
   // Recent flagged entries
-  const { data: flagged } = await supabase
-    .from("volunteer_hours")
-    .select("*, users(first_name, last_name), families(name)")
-    .eq("flagged", true)
-    .order("created_at", { ascending: false })
-    .limit(10);
+  const flagged = await prisma.volunteerHour.findMany({
+    where: { flagged: true },
+    include: {
+      user: { select: { firstName: true, lastName: true } },
+      family: { select: { name: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+  });
 
   return (
     <div className="space-y-6">
@@ -182,9 +183,8 @@ export default async function AdminDashboardPage() {
                     <div>
                       <div className="font-medium">{entry.description}</div>
                       <div className="text-sm text-muted-foreground">
-                        {(entry.users as { first_name: string; last_name: string })?.first_name}{" "}
-                        {(entry.users as { first_name: string; last_name: string })?.last_name} &middot;{" "}
-                        {(entry.families as { name: string })?.name}
+                        {entry.user.firstName} {entry.user.lastName} &middot;{" "}
+                        {entry.family.name}
                       </div>
                     </div>
                     <Badge variant="destructive">

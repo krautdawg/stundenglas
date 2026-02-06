@@ -1,23 +1,23 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function joinKreis(kreisId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
-  if (!user) return { error: "Nicht angemeldet" };
-
-  const { error } = await supabase.from("kreis_memberships").insert({
-    user_id: user.id,
-    kreis_id: kreisId,
-  });
-
-  if (error) {
-    if (error.code === "23505") {
+  try {
+    await prisma.kreisMembership.create({
+      data: {
+        userId: session.user.id,
+        kreisId,
+      },
+    });
+  } catch (error: unknown) {
+    // Check for unique constraint violation
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
       return { error: "Du bist bereits Mitglied dieses Kreises" };
     }
     return { error: "Beitritt fehlgeschlagen" };
@@ -28,20 +28,21 @@ export async function joinKreis(kreisId: string) {
 }
 
 export async function leaveKreis(kreisId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
-  if (!user) return { error: "Nicht angemeldet" };
-
-  const { error } = await supabase
-    .from("kreis_memberships")
-    .delete()
-    .eq("user_id", user.id)
-    .eq("kreis_id", kreisId);
-
-  if (error) return { error: "Austritt fehlgeschlagen" };
+  try {
+    await prisma.kreisMembership.delete({
+      where: {
+        userId_kreisId: {
+          userId: session.user.id,
+          kreisId,
+        },
+      },
+    });
+  } catch {
+    return { error: "Austritt fehlgeschlagen" };
+  }
 
   revalidatePath("/kreise");
   return { success: true };

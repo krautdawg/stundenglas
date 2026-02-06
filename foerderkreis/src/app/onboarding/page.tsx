@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +15,14 @@ import {
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  createFamily,
+  joinFamily,
+  updateOnboardingProfile,
+  joinKreise,
+  completeOnboarding,
+  getKreise,
+} from "@/actions/onboarding";
 
 const STEPS = ["Familie", "Profil", "Kreise"];
 
@@ -47,23 +54,13 @@ export default function OnboardingPage() {
 
   // Kreise step
   const [kreise, setKreise] = useState<
-    { id: string; name: string; icon: string }[]
+    { id: string; name: string; icon: string | null }[]
   >([]);
   const [selectedKreise, setSelectedKreise] = useState<string[]>([]);
   const [kreiseLoaded, setKreiseLoaded] = useState(false);
 
   async function handleFamilyStep() {
     setLoading(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      toast.error("Nicht angemeldet");
-      setLoading(false);
-      return;
-    }
 
     if (familyMode === "create") {
       if (!familyName.trim()) {
@@ -72,39 +69,19 @@ export default function OnboardingPage() {
         return;
       }
 
-      const { data: family, error } = await supabase
-        .from("families")
-        .insert({ name: familyName })
-        .select()
-        .single();
-
-      if (error || !family) {
-        toast.error("Familie konnte nicht erstellt werden");
+      const result = await createFamily(familyName);
+      if (result.error) {
+        toast.error(result.error);
         setLoading(false);
         return;
       }
-
-      await supabase
-        .from("users")
-        .update({ family_id: family.id })
-        .eq("id", user.id);
     } else if (familyMode === "join") {
-      const { data: family, error } = await supabase
-        .from("families")
-        .select("id")
-        .eq("invite_code", inviteCode.toLowerCase().trim())
-        .single();
-
-      if (error || !family) {
-        toast.error("Familie nicht gefunden");
+      const result = await joinFamily(inviteCode);
+      if (result.error) {
+        toast.error(result.error);
         setLoading(false);
         return;
       }
-
-      await supabase
-        .from("users")
-        .update({ family_id: family.id })
-        .eq("id", user.id);
     }
 
     setLoading(false);
@@ -113,32 +90,22 @@ export default function OnboardingPage() {
 
   async function handleProfileStep() {
     setLoading(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
-    if (!user) {
+    const result = await updateOnboardingProfile({
+      firstName,
+      lastName,
+      skillTags: skills,
+    });
+
+    if (result.error) {
+      toast.error(result.error);
       setLoading(false);
       return;
     }
 
-    await supabase
-      .from("users")
-      .update({
-        first_name: firstName,
-        last_name: lastName,
-        skill_tags: skills,
-      })
-      .eq("id", user.id);
-
     // Load kreise for next step
     if (!kreiseLoaded) {
-      const { data } = await supabase
-        .from("kreise")
-        .select("id, name, icon")
-        .eq("is_active", true)
-        .order("name");
+      const data = await getKreise();
       if (data) setKreise(data);
       setKreiseLoaded(true);
     }
@@ -149,31 +116,24 @@ export default function OnboardingPage() {
 
   async function handleKreiseStep() {
     setLoading(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setLoading(false);
-      return;
-    }
 
     // Join selected Kreise
     if (selectedKreise.length > 0) {
-      await supabase.from("kreis_memberships").insert(
-        selectedKreise.map((kreisId) => ({
-          user_id: user.id,
-          kreis_id: kreisId,
-        }))
-      );
+      const result = await joinKreise(selectedKreise);
+      if (result.error) {
+        toast.error(result.error);
+        setLoading(false);
+        return;
+      }
     }
 
     // Mark onboarding as complete
-    await supabase
-      .from("users")
-      .update({ onboarding_completed: true })
-      .eq("id", user.id);
+    const completeResult = await completeOnboarding();
+    if (completeResult.error) {
+      toast.error(completeResult.error);
+      setLoading(false);
+      return;
+    }
 
     setLoading(false);
     toast.success("Willkommen beim Foerderkreis!");
@@ -333,9 +293,7 @@ export default function OnboardingPage() {
                   {COMMON_SKILLS.map((skill) => (
                     <Badge
                       key={skill}
-                      variant={
-                        skills.includes(skill) ? "default" : "outline"
-                      }
+                      variant={skills.includes(skill) ? "default" : "outline"}
                       className="cursor-pointer"
                       onClick={() =>
                         setSkills((prev) =>

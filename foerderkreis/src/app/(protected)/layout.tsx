@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { BottomNav } from "@/components/custom/bottom-nav";
 
 export default async function ProtectedLayout({
@@ -7,23 +8,19 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
 
-  if (!user) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
   // Check onboarding status
-  const { data: profile } = await supabase
-    .from("users")
-    .select("onboarding_completed")
-    .eq("id", user.id)
-    .single();
+  const profile = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { onboardingCompleted: true },
+  });
 
-  if (profile && !profile.onboarding_completed) {
+  if (profile && !profile.onboardingCompleted) {
     redirect("/onboarding");
   }
 

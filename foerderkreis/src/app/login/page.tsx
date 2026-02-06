@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,21 +19,24 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    try {
+      const result = await signIn("email", {
+        email,
+        redirect: false,
+        callbackUrl: "/dashboard",
+      });
 
-    if (error) {
+      if (result?.error) {
+        setError("Es gab einen Fehler. Bitte versuche es erneut.");
+        setLoading(false);
+        return;
+      }
+
+      setSent(true);
+    } catch {
       setError("Es gab einen Fehler. Bitte versuche es erneut.");
-      setLoading(false);
-      return;
     }
-
-    setSent(true);
+    
     setLoading(false);
   }
 

@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Minus, Plus, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { logHoursClient, getKreise } from "@/actions/hours-client";
 
 export default function LogHoursPage() {
   const router = useRouter();
@@ -22,18 +22,14 @@ export default function LogHoursPage() {
   const [kreiseLoaded, setKreiseLoaded] = useState(false);
 
   // Load Kreise on mount
-  if (!kreiseLoaded) {
-    const supabase = createClient();
-    supabase
-      .from("kreise")
-      .select("id, name")
-      .eq("is_active", true)
-      .order("name")
-      .then(({ data }) => {
+  useEffect(() => {
+    if (!kreiseLoaded) {
+      getKreise().then((data) => {
         if (data) setKreise(data);
         setKreiseLoaded(true);
       });
-  }
+    }
+  }, [kreiseLoaded]);
 
   function adjustHours(delta: number) {
     setHours((prev) => {
@@ -46,40 +42,15 @@ export default function LogHoursPage() {
     e.preventDefault();
     setLoading(true);
 
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      toast.error("Nicht angemeldet");
-      setLoading(false);
-      return;
-    }
-
-    const { data: profile } = await supabase
-      .from("users")
-      .select("family_id")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile?.family_id) {
-      toast.error("Du gehoerst noch keiner Familie an");
-      setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.from("volunteer_hours").insert({
-      user_id: user.id,
-      family_id: profile.family_id,
-      kreis_id: kreisId || null,
+    const result = await logHoursClient({
       hours,
       description,
-      date_performed: date,
+      datePerformed: date,
+      kreisId: kreisId || null,
     });
 
-    if (error) {
-      toast.error("Stunden konnten nicht erfasst werden");
+    if (result.error) {
+      toast.error(result.error);
       setLoading(false);
       return;
     }

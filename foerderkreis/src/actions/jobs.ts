@@ -1,16 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { jobSchema } from "@/lib/validations";
+import { JobStatus, JobUrgency } from "@prisma/client";
 
 export async function createJob(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Nicht angemeldet" };
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
   const raw = {
     title: formData.get("title") as string,
@@ -31,129 +29,138 @@ export async function createJob(formData: FormData) {
     return { error: parsed.error.issues[0].message };
   }
 
-  const { error } = await supabase.from("jobs").insert({
-    ...parsed.data,
-    posted_by: user.id,
-  });
-
-  if (error) return { error: "Aufgabe konnte nicht erstellt werden" };
+  try {
+    await prisma.job.create({
+      data: {
+        title: parsed.data.title,
+        description: parsed.data.description,
+        kreisId: parsed.data.kreis_id,
+        estimatedHours: parsed.data.estimated_hours,
+        urgency: parsed.data.urgency.toUpperCase() as JobUrgency,
+        location: parsed.data.location,
+        skillsNeeded: parsed.data.skills_needed,
+        dueDate: parsed.data.due_date ? new Date(parsed.data.due_date) : null,
+        maxClaimants: parsed.data.max_claimants,
+        postedBy: session.user.id,
+      },
+    });
+  } catch {
+    return { error: "Aufgabe konnte nicht erstellt werden" };
+  }
 
   revalidatePath("/jobs");
   return { success: true };
 }
 
 export async function claimJob(jobId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Nicht angemeldet" };
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
   // Check if already claimed
-  const { data: existing } = await supabase
-    .from("job_claims")
-    .select("id")
-    .eq("job_id", jobId)
-    .eq("user_id", user.id)
-    .single();
+  const existing = await prisma.jobClaim.findUnique({
+    where: {
+      jobId_userId: { jobId, userId: session.user.id },
+    },
+  });
 
   if (existing) return { error: "Du hast diese Aufgabe bereits uebernommen" };
 
   // Check if max claimants reached
-  const { data: job } = await supabase
-    .from("jobs")
-    .select("max_claimants")
-    .eq("id", jobId)
-    .single();
+  const job = await prisma.job.findUnique({
+    where: { id: jobId },
+    select: { maxClaimants: true },
+  });
 
-  const { count } = await supabase
-    .from("job_claims")
-    .select("*", { count: "exact", head: true })
-    .eq("job_id", jobId)
-    .in("status", ["claimed", "completed"]);
+  const claimCount = await prisma.jobClaim.count({
+    where: {
+      jobId,
+      status: { in: ["CLAIMED", "COMPLETED"] },
+    },
+  });
 
-  if (job && count !== null && count >= job.max_claimants) {
+  if (job && claimCount >= job.maxClaimants) {
     return { error: "Alle Plaetze sind bereits vergeben" };
   }
 
-  const { error } = await supabase.from("job_claims").insert({
-    job_id: jobId,
-    user_id: user.id,
-  });
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.jobClaim.create({
+        data: {
+          jobId,
+          userId: session.user.id,
+        },
+      });
 
-  if (error) return { error: "Aufgabe konnte nicht uebernommen werden" };
-
-  // Update job status if first claim
-  await supabase
-    .from("jobs")
-    .update({ status: "claimed" })
-    .eq("id", jobId)
-    .eq("status", "open");
+      // Update job status if first claim
+      await tx.job.updateMany({
+        where: { id: jobId, status: "OPEN" },
+        data: { status: "CLAIMED" },
+      });
+    });
+  } catch {
+    return { error: "Aufgabe konnte nicht uebernommen werden" };
+  }
 
   revalidatePath("/jobs");
   return { success: true };
 }
 
 export async function completeJobClaim(jobId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Nicht angemeldet" };
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
   // Get user's family and job details
-  const { data: profile } = await supabase
-    .from("users")
-    .select("family_id")
-    .eq("id", user.id)
-    .single();
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { familyId: true },
+  });
 
-  if (!profile?.family_id) {
+  if (!user?.familyId) {
     return { error: "Du gehoerst noch keiner Familie an" };
   }
 
-  const { data: job } = await supabase
-    .from("jobs")
-    .select("estimated_hours, kreis_id, title")
-    .eq("id", jobId)
-    .single();
+  const job = await prisma.job.findUnique({
+    where: { id: jobId },
+    select: { estimatedHours: true, kreisId: true, title: true },
+  });
 
   if (!job) return { error: "Aufgabe nicht gefunden" };
 
-  // Update claim status
-  const { error: claimError } = await supabase
-    .from("job_claims")
-    .update({ status: "completed", completed_at: new Date().toISOString() })
-    .eq("job_id", jobId)
-    .eq("user_id", user.id);
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Update claim status
+      await tx.jobClaim.updateMany({
+        where: { jobId, userId: session.user.id },
+        data: { status: "COMPLETED", completedAt: new Date() },
+      });
 
-  if (claimError) return { error: "Status konnte nicht aktualisiert werden" };
+      // Auto-log hours
+      await tx.volunteerHour.create({
+        data: {
+          userId: session.user.id,
+          familyId: user.familyId!,
+          kreisId: job.kreisId,
+          jobId,
+          hours: job.estimatedHours,
+          description: `Aufgabe erledigt: ${job.title}`,
+          datePerformed: new Date(),
+        },
+      });
 
-  // Auto-log hours
-  await supabase.from("volunteer_hours").insert({
-    user_id: user.id,
-    family_id: profile.family_id,
-    kreis_id: job.kreis_id,
-    job_id: jobId,
-    hours: job.estimated_hours,
-    description: `Aufgabe erledigt: ${job.title}`,
-    date_performed: new Date().toISOString().split("T")[0],
-  });
+      // Check if all claims are completed
+      const activeClaims = await tx.jobClaim.count({
+        where: { jobId, status: "CLAIMED" },
+      });
 
-  // Check if all claims are completed
-  const { count: activeClaims } = await supabase
-    .from("job_claims")
-    .select("*", { count: "exact", head: true })
-    .eq("job_id", jobId)
-    .eq("status", "claimed");
-
-  if (activeClaims === 0) {
-    await supabase
-      .from("jobs")
-      .update({ status: "completed" })
-      .eq("id", jobId);
+      if (activeClaims === 0) {
+        await tx.job.update({
+          where: { id: jobId },
+          data: { status: "COMPLETED" },
+        });
+      }
+    });
+  } catch {
+    return { error: "Status konnte nicht aktualisiert werden" };
   }
 
   revalidatePath("/jobs");
@@ -163,31 +170,33 @@ export async function completeJobClaim(jobId: string) {
 }
 
 export async function withdrawClaim(jobId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
-  if (!user) return { error: "Nicht angemeldet" };
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.jobClaim.updateMany({
+        where: { jobId, userId: session.user.id, status: "CLAIMED" },
+        data: { status: "WITHDRAWN" },
+      });
 
-  const { error } = await supabase
-    .from("job_claims")
-    .update({ status: "withdrawn" })
-    .eq("job_id", jobId)
-    .eq("user_id", user.id)
-    .eq("status", "claimed");
+      // Check if any claims remain, reopen if not
+      const remainingClaims = await tx.jobClaim.count({
+        where: {
+          jobId,
+          status: { in: ["CLAIMED", "COMPLETED"] },
+        },
+      });
 
-  if (error) return { error: "Konnte nicht zurueckgezogen werden" };
-
-  // Check if any claims remain, reopen if not
-  const { count } = await supabase
-    .from("job_claims")
-    .select("*", { count: "exact", head: true })
-    .eq("job_id", jobId)
-    .in("status", ["claimed", "completed"]);
-
-  if (count === 0) {
-    await supabase.from("jobs").update({ status: "open" }).eq("id", jobId);
+      if (remainingClaims === 0) {
+        await tx.job.update({
+          where: { id: jobId },
+          data: { status: "OPEN" },
+        });
+      }
+    });
+  } catch {
+    return { error: "Konnte nicht zurueckgezogen werden" };
   }
 
   revalidatePath("/jobs");

@@ -1,16 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { familyCreateSchema, familyJoinSchema } from "@/lib/validations";
 
 export async function createFamily(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Nicht angemeldet" };
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
   const parsed = familyCreateSchema.safeParse({
     name: formData.get("name"),
@@ -20,38 +17,31 @@ export async function createFamily(formData: FormData) {
     return { error: parsed.error.issues[0].message };
   }
 
-  // Create family
-  const { data: family, error: familyError } = await supabase
-    .from("families")
-    .insert({ name: parsed.data.name })
-    .select()
-    .single();
+  try {
+    // Create family and link user in a transaction
+    const family = await prisma.$transaction(async (tx) => {
+      const newFamily = await tx.family.create({
+        data: { name: parsed.data.name },
+      });
 
-  if (familyError || !family) {
+      await tx.user.update({
+        where: { id: session.user.id },
+        data: { familyId: newFamily.id },
+      });
+
+      return newFamily;
+    });
+
+    revalidatePath("/dashboard");
+    return { success: true, family };
+  } catch {
     return { error: "Familie konnte nicht erstellt werden" };
   }
-
-  // Link user to family
-  const { error: linkError } = await supabase
-    .from("users")
-    .update({ family_id: family.id })
-    .eq("id", user.id);
-
-  if (linkError) {
-    return { error: "Verknuepfung mit Familie fehlgeschlagen" };
-  }
-
-  revalidatePath("/dashboard");
-  return { success: true, family };
 }
 
 export async function joinFamily(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Nicht angemeldet" };
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
   const parsed = familyJoinSchema.safeParse({
     invite_code: formData.get("invite_code"),
@@ -62,23 +52,21 @@ export async function joinFamily(formData: FormData) {
   }
 
   // Find family by invite code
-  const { data: family, error: findError } = await supabase
-    .from("families")
-    .select("id, name")
-    .eq("invite_code", parsed.data.invite_code.toLowerCase().trim())
-    .single();
+  const family = await prisma.family.findUnique({
+    where: { inviteCode: parsed.data.invite_code.toLowerCase().trim() },
+    select: { id: true, name: true },
+  });
 
-  if (findError || !family) {
+  if (!family) {
     return { error: "Familie nicht gefunden. Pruefe den Einladungscode." };
   }
 
-  // Link user to family
-  const { error: linkError } = await supabase
-    .from("users")
-    .update({ family_id: family.id })
-    .eq("id", user.id);
-
-  if (linkError) {
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { familyId: family.id },
+    });
+  } catch {
     return { error: "Beitritt fehlgeschlagen" };
   }
 

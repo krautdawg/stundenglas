@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Settings, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { updateFamilyAdmin } from "@/actions/admin";
 
 interface Props {
   familyId: string;
@@ -30,17 +30,13 @@ export function FamilyAdminActions({
 
   async function handleSave() {
     setLoading(true);
-    const supabase = createClient();
 
-    const { error } = await supabase
-      .from("families")
-      .update({
-        monthly_hour_target: parseFloat(target),
-        notes: notes || null,
-      })
-      .eq("id", familyId);
+    const result = await updateFamilyAdmin(familyId, {
+      monthlyHourTarget: parseFloat(target),
+      notes: notes || null,
+    });
 
-    if (error) {
+    if (result.error) {
       toast.error("Speichern fehlgeschlagen");
     } else {
       toast.success("Familie aktualisiert");

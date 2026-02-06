@@ -1,16 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { profileSchema } from "@/lib/validations";
 
 export async function updateProfile(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Nicht angemeldet" };
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
   const raw = {
     first_name: formData.get("first_name") as string,
@@ -24,37 +21,36 @@ export async function updateProfile(formData: FormData) {
     return { error: parsed.error.issues[0].message };
   }
 
-  const { error } = await supabase
-    .from("users")
-    .update({
-      first_name: parsed.data.first_name,
-      last_name: parsed.data.last_name,
-      bio: parsed.data.bio || null,
-      skill_tags: parsed.data.skill_tags,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", user.id);
-
-  if (error) return { error: "Profil konnte nicht aktualisiert werden" };
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        firstName: parsed.data.first_name,
+        lastName: parsed.data.last_name,
+        bio: parsed.data.bio || null,
+        skillTags: parsed.data.skill_tags,
+      },
+    });
+  } catch {
+    return { error: "Profil konnte nicht aktualisiert werden" };
+  }
 
   revalidatePath("/profile");
   return { success: true };
 }
 
 export async function updatePrivacyMode(enabled: boolean) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
-  if (!user) return { error: "Nicht angemeldet" };
-
-  const { error } = await supabase
-    .from("users")
-    .update({ privacy_mode: enabled })
-    .eq("id", user.id);
-
-  if (error) return { error: "Einstellung konnte nicht gespeichert werden" };
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { privacyMode: enabled },
+    });
+  } catch {
+    return { error: "Einstellung konnte nicht gespeichert werden" };
+  }
 
   revalidatePath("/profile");
   revalidatePath("/leaderboard");
@@ -62,12 +58,8 @@ export async function updatePrivacyMode(enabled: boolean) {
 }
 
 export async function uploadAvatar(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Nicht angemeldet" };
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Nicht angemeldet" };
 
   const file = formData.get("avatar") as File;
   if (!file) return { error: "Keine Datei ausgewaehlt" };
@@ -76,24 +68,22 @@ export async function uploadAvatar(formData: FormData) {
     return { error: "Datei zu gross (max. 1 MB)" };
   }
 
-  const ext = file.name.split(".").pop();
-  const path = `avatars/${user.id}.${ext}`;
+  // For now, we'll use a base64 data URL (simple solution)
+  // In production, you'd use S3, Cloudflare R2, or similar
+  const buffer = await file.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString("base64");
+  const mimeType = file.type || "image/png";
+  const dataUrl = `data:${mimeType};base64,${base64}`;
 
-  const { error: uploadError } = await supabase.storage
-    .from("avatars")
-    .upload(path, file, { upsert: true });
-
-  if (uploadError) return { error: "Upload fehlgeschlagen" };
-
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from("avatars").getPublicUrl(path);
-
-  await supabase
-    .from("users")
-    .update({ avatar_url: publicUrl })
-    .eq("id", user.id);
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { avatarUrl: dataUrl },
+    });
+  } catch {
+    return { error: "Upload fehlgeschlagen" };
+  }
 
   revalidatePath("/profile");
-  return { success: true, url: publicUrl };
+  return { success: true, url: dataUrl };
 }

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,12 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
+import { createJob, getKreise } from "@/actions/jobs-client";
 
 const urgencyOptions = [
-  { value: "low", label: "Niedrig", desc: "Kein Zeitdruck" },
-  { value: "normal", label: "Normal", desc: "In den naechsten Wochen" },
-  { value: "high", label: "Dringend", desc: "Diese Woche" },
-  { value: "critical", label: "Kritisch", desc: "Sofort" },
+  { value: "LOW", label: "Niedrig", desc: "Kein Zeitdruck" },
+  { value: "NORMAL", label: "Normal", desc: "In den naechsten Wochen" },
+  { value: "HIGH", label: "Dringend", desc: "Diese Woche" },
+  { value: "CRITICAL", label: "Kritisch", desc: "Sofort" },
 ];
 
 export default function NewJobPage() {
@@ -27,50 +27,32 @@ export default function NewJobPage() {
   const [description, setDescription] = useState("");
   const [estimatedHours, setEstimatedHours] = useState("1");
   const [kreisId, setKreisId] = useState("");
-  const [urgency, setUrgency] = useState("normal");
+  const [urgency, setUrgency] = useState("NORMAL");
   const [dueDate, setDueDate] = useState("");
   const [maxClaimants, setMaxClaimants] = useState("1");
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase
-      .from("kreise")
-      .select("id, name")
-      .eq("is_active", true)
-      .order("name")
-      .then(({ data }) => {
-        if (data) setKreise(data);
-      });
+    getKreise().then((data) => {
+      if (data) setKreise(data);
+    });
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
 
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      toast.error("Nicht angemeldet");
-      setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.from("jobs").insert({
+    const result = await createJob({
       title,
       description: description || null,
-      kreis_id: kreisId || null,
-      posted_by: user.id,
-      estimated_hours: parseFloat(estimatedHours),
+      kreisId: kreisId || null,
+      estimatedHours: parseFloat(estimatedHours),
       urgency,
-      due_date: dueDate || null,
-      max_claimants: parseInt(maxClaimants),
+      dueDate: dueDate || null,
+      maxClaimants: parseInt(maxClaimants),
     });
 
-    if (error) {
-      toast.error("Aufgabe konnte nicht erstellt werden");
+    if (result.error) {
+      toast.error(result.error);
       setLoading(false);
       return;
     }

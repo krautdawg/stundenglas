@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,45 +8,41 @@ import Link from "next/link";
 import { ArrowLeft, Users } from "lucide-react";
 
 export default async function AdminKreisePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session!.user.id;
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user!.id)
-    .single();
+  const profile = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
 
-  if (profile?.role !== "admin") redirect("/dashboard");
+  if (profile?.role !== "ADMIN") redirect("/dashboard");
 
-  const { data: kreise } = await supabase
-    .from("kreise")
-    .select("*")
-    .order("name");
+  const kreise = await prisma.kreis.findMany({
+    orderBy: { name: "asc" },
+  });
 
   // Get member counts
-  const { data: memberships } = await supabase
-    .from("kreis_memberships")
-    .select("kreis_id");
+  const memberships = await prisma.kreisMembership.findMany({
+    select: { kreisId: true },
+  });
 
   const memberMap: Record<string, number> = {};
-  memberships?.forEach((m) => {
-    memberMap[m.kreis_id] = (memberMap[m.kreis_id] || 0) + 1;
+  memberships.forEach((m) => {
+    memberMap[m.kreisId] = (memberMap[m.kreisId] || 0) + 1;
   });
 
   // Get job counts
-  const { data: jobs } = await supabase
-    .from("jobs")
-    .select("kreis_id, status");
+  const jobs = await prisma.job.findMany({
+    select: { kreisId: true, status: true },
+  });
 
   const jobMap: Record<string, { open: number; total: number }> = {};
-  jobs?.forEach((j) => {
-    if (j.kreis_id) {
-      if (!jobMap[j.kreis_id]) jobMap[j.kreis_id] = { open: 0, total: 0 };
-      jobMap[j.kreis_id].total++;
-      if (j.status === "open") jobMap[j.kreis_id].open++;
+  jobs.forEach((j) => {
+    if (j.kreisId) {
+      if (!jobMap[j.kreisId]) jobMap[j.kreisId] = { open: 0, total: 0 };
+      jobMap[j.kreisId].total++;
+      if (j.status === "OPEN") jobMap[j.kreisId].open++;
     }
   });
 
@@ -61,12 +58,12 @@ export default async function AdminKreisePage() {
           <h1 className="text-2xl font-heading font-extrabold">
             Kreise verwalten
           </h1>
-          <p className="text-muted-foreground">{kreise?.length} Kreise</p>
+          <p className="text-muted-foreground">{kreise.length} Kreise</p>
         </div>
       </div>
 
       <div className="space-y-2">
-        {kreise?.map((kreis) => (
+        {kreise.map((kreis) => (
           <Card key={kreis.id}>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -87,7 +84,7 @@ export default async function AdminKreisePage() {
                   </div>
                 </div>
                 <div>
-                  {!kreis.is_active && (
+                  {!kreis.isActive && (
                     <Badge variant="destructive">Inaktiv</Badge>
                   )}
                   {kreis.color && (

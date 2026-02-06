@@ -1,52 +1,46 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 export default async function KreisePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session!.user.id;
 
-  const { data: kreise } = await supabase
-    .from("kreise")
-    .select("*")
-    .eq("is_active", true)
-    .order("name");
+  const kreise = await prisma.kreis.findMany({
+    where: { isActive: true },
+    orderBy: { name: "asc" },
+  });
 
   // Get membership info for current user
-  const { data: memberships } = await supabase
-    .from("kreis_memberships")
-    .select("kreis_id")
-    .eq("user_id", user!.id);
+  const memberships = await prisma.kreisMembership.findMany({
+    where: { userId },
+    select: { kreisId: true },
+  });
 
-  const memberKreisIds = new Set(memberships?.map((m) => m.kreis_id));
+  const memberKreisIds = new Set(memberships.map((m) => m.kreisId));
 
   // Get member counts
-  const { data: memberCounts } = await supabase
-    .from("kreis_memberships")
-    .select("kreis_id")
-    .then(({ data }) => {
-      const counts: Record<string, number> = {};
-      data?.forEach((m) => {
-        counts[m.kreis_id] = (counts[m.kreis_id] || 0) + 1;
-      });
-      return { data: counts };
-    });
+  const allMemberships = await prisma.kreisMembership.findMany({
+    select: { kreisId: true },
+  });
+
+  const memberCounts: Record<string, number> = {};
+  allMemberships.forEach((m) => {
+    memberCounts[m.kreisId] = (memberCounts[m.kreisId] || 0) + 1;
+  });
 
   // Get open job counts per Kreis
-  const { data: jobCounts } = await supabase
-    .from("jobs")
-    .select("kreis_id")
-    .eq("status", "open")
-    .then(({ data }) => {
-      const counts: Record<string, number> = {};
-      data?.forEach((j) => {
-        if (j.kreis_id) counts[j.kreis_id] = (counts[j.kreis_id] || 0) + 1;
-      });
-      return { data: counts };
-    });
+  const jobs = await prisma.job.findMany({
+    where: { status: "OPEN" },
+    select: { kreisId: true },
+  });
+
+  const jobCounts: Record<string, number> = {};
+  jobs.forEach((j) => {
+    if (j.kreisId) jobCounts[j.kreisId] = (jobCounts[j.kreisId] || 0) + 1;
+  });
 
   return (
     <div className="space-y-6">
@@ -58,10 +52,10 @@ export default async function KreisePage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        {kreise?.map((kreis) => {
+        {kreise.map((kreis) => {
           const isMember = memberKreisIds.has(kreis.id);
-          const members = memberCounts?.[kreis.id] ?? 0;
-          const openJobs = jobCounts?.[kreis.id] ?? 0;
+          const members = memberCounts[kreis.id] ?? 0;
+          const openJobs = jobCounts[kreis.id] ?? 0;
 
           return (
             <Link key={kreis.id} href={`/kreise/${kreis.slug}`}>

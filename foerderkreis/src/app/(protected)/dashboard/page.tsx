@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { ProgressRing } from "@/components/custom/progress-ring";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,16 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, Briefcase, TrendingUp, Calendar } from "lucide-react";
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session!.user.id;
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("*, families(*)")
-    .eq("id", user!.id)
-    .single();
+  const profile = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { family: true },
+  });
 
   // Get hours this month
   const startOfMonth = new Date();
@@ -27,47 +25,46 @@ export default async function DashboardPage() {
   startOfYear.setMonth(0, 1);
   startOfYear.setHours(0, 0, 0, 0);
 
-  const familyId = profile?.family_id;
+  const familyId = profile?.familyId;
+  const monthlyTarget = Number(profile?.family?.monthlyHourTarget ?? 10);
 
   let hoursThisMonth = 0;
   let hoursThisYear = 0;
-  const monthlyTarget = profile?.families?.monthly_hour_target ?? 10;
 
   if (familyId) {
-    const { data: monthHours } = await supabase
-      .from("volunteer_hours")
-      .select("hours")
-      .eq("family_id", familyId)
-      .gte("date_performed", startOfMonth.toISOString().split("T")[0]);
+    const monthHours = await prisma.volunteerHour.aggregate({
+      where: {
+        familyId,
+        datePerformed: { gte: startOfMonth },
+      },
+      _sum: { hours: true },
+    });
+    hoursThisMonth = Number(monthHours._sum.hours ?? 0);
 
-    hoursThisMonth =
-      monthHours?.reduce((sum, h) => sum + Number(h.hours), 0) ?? 0;
-
-    const { data: yearHours } = await supabase
-      .from("volunteer_hours")
-      .select("hours")
-      .eq("family_id", familyId)
-      .gte("date_performed", startOfYear.toISOString().split("T")[0]);
-
-    hoursThisYear =
-      yearHours?.reduce((sum, h) => sum + Number(h.hours), 0) ?? 0;
+    const yearHours = await prisma.volunteerHour.aggregate({
+      where: {
+        familyId,
+        datePerformed: { gte: startOfYear },
+      },
+      _sum: { hours: true },
+    });
+    hoursThisYear = Number(yearHours._sum.hours ?? 0);
   }
 
   // Recent activity
-  const { data: recentHours } = await supabase
-    .from("volunteer_hours")
-    .select("*, kreise(name, color)")
-    .eq("family_id", familyId ?? "")
-    .order("created_at", { ascending: false })
-    .limit(3);
+  const recentHours = familyId
+    ? await prisma.volunteerHour.findMany({
+        where: { familyId },
+        include: { kreis: { select: { name: true, color: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      })
+    : [];
 
   // Available jobs count
-  const { count: openJobs } = await supabase
-    .from("jobs")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "open");
+  const openJobs = await prisma.job.count({ where: { status: "OPEN" } });
 
-  const firstName = profile?.first_name || "dort";
+  const firstName = profile?.firstName || "dort";
   const currentMonth = new Date().toLocaleDateString("de-DE", {
     month: "long",
   });
@@ -176,7 +173,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Recent Activity */}
-      {recentHours && recentHours.length > 0 && (
+      {recentHours.length > 0 && (
         <div>
           <h2 className="text-lg font-heading font-bold mb-3">
             Letzte Eintraege
@@ -198,14 +195,14 @@ export default async function DashboardPage() {
                       {entry.description}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {new Date(entry.date_performed).toLocaleDateString(
+                      {new Date(entry.datePerformed).toLocaleDateString(
                         "de-DE",
                         { day: "numeric", month: "short" }
                       )}
                     </div>
-                    {entry.kreise && (
+                    {entry.kreis && (
                       <Badge variant="secondary" className="mt-1 text-xs">
-                        {(entry.kreise as { name: string }).name}
+                        {entry.kreis.name}
                       </Badge>
                     )}
                   </div>

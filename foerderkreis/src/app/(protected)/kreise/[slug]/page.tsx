@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,38 +15,42 @@ export default async function KreisDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session!.user.id;
 
-  const { data: kreis } = await supabase
-    .from("kreise")
-    .select("*")
-    .eq("slug", slug)
-    .single();
+  const kreis = await prisma.kreis.findUnique({
+    where: { slug },
+  });
 
   if (!kreis) notFound();
 
   // Members
-  const { data: members } = await supabase
-    .from("kreis_memberships")
-    .select("role, users(id, first_name, last_name, avatar_url)")
-    .eq("kreis_id", kreis.id);
+  const members = await prisma.kreisMembership.findMany({
+    where: { kreisId: kreis.id },
+    include: {
+      user: {
+        select: { id: true, firstName: true, lastName: true, avatarUrl: true },
+      },
+    },
+  });
 
   // Check if current user is member
-  const isMember = members?.some(
-    (m) => (m.users as unknown as { id: string })?.id === user!.id
-  );
+  const isMember = members.some((m) => m.user.id === userId);
 
   // Jobs for this Kreis
-  const { data: jobs } = await supabase
-    .from("jobs")
-    .select("*, job_claims(id, status)")
-    .eq("kreis_id", kreis.id)
-    .in("status", ["open", "claimed", "in_progress"])
-    .order("urgency", { ascending: false })
-    .limit(10);
+  const jobs = await prisma.job.findMany({
+    where: {
+      kreisId: kreis.id,
+      status: { in: ["OPEN", "CLAIMED", "IN_PROGRESS"] },
+    },
+    include: {
+      claims: {
+        select: { id: true, status: true },
+      },
+    },
+    orderBy: { urgency: "desc" },
+    take: 10,
+  });
 
   return (
     <div className="space-y-6">
@@ -66,36 +71,28 @@ export default async function KreisDetailPage({
       {/* Members */}
       <div>
         <h2 className="font-heading font-bold mb-3">
-          Mitglieder ({members?.length ?? 0})
+          Mitglieder ({members.length})
         </h2>
         <div className="flex flex-wrap gap-3">
-          {members?.map((m) => {
-            const memberUser = m.users as unknown as {
-              id: string;
-              first_name: string;
-              last_name: string;
-              avatar_url: string | null;
-            };
-            return (
-              <div
-                key={memberUser.id}
-                className="flex items-center gap-2 bg-muted rounded-full pl-1 pr-3 py-1"
-              >
-                <div className="w-7 h-7 rounded-full bg-amber-200 flex items-center justify-center text-xs font-bold text-amber-800">
-                  {memberUser.first_name[0]}
-                  {memberUser.last_name[0]}
-                </div>
-                <span className="text-sm">
-                  {memberUser.first_name} {memberUser.last_name[0]}.
-                </span>
-                {m.role === "lead" && (
-                  <Badge variant="secondary" className="text-[10px]">
-                    Leitung
-                  </Badge>
-                )}
+          {members.map((m) => (
+            <div
+              key={m.user.id}
+              className="flex items-center gap-2 bg-muted rounded-full pl-1 pr-3 py-1"
+            >
+              <div className="w-7 h-7 rounded-full bg-amber-200 flex items-center justify-center text-xs font-bold text-amber-800">
+                {m.user.firstName[0]}
+                {m.user.lastName[0]}
               </div>
-            );
-          })}
+              <span className="text-sm">
+                {m.user.firstName} {m.user.lastName[0]}.
+              </span>
+              {m.role === "LEAD" && (
+                <Badge variant="secondary" className="text-[10px]">
+                  Leitung
+                </Badge>
+              )}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -113,13 +110,9 @@ export default async function KreisDetailPage({
         {jobs && jobs.length > 0 ? (
           <div className="space-y-2">
             {jobs.map((job) => {
-              const activeClaims =
-                (
-                  job.job_claims as { id: string; status: string }[]
-                )?.filter(
-                  (c) =>
-                    c.status === "claimed" || c.status === "completed"
-                ).length ?? 0;
+              const activeClaims = job.claims.filter(
+                (c) => c.status === "CLAIMED" || c.status === "COMPLETED"
+              ).length;
 
               return (
                 <Link key={job.id} href={`/jobs/${job.id}`}>
@@ -129,7 +122,7 @@ export default async function KreisDetailPage({
                         <h3 className="font-medium">{job.title}</h3>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="h-3 w-3" />
-                          {Number(job.estimated_hours)
+                          {Number(job.estimatedHours)
                             .toString()
                             .replace(".", ",")}
                           h
@@ -137,8 +130,8 @@ export default async function KreisDetailPage({
                       </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                         <Users className="h-3 w-3" />
-                        {job.max_claimants - activeClaims}/
-                        {job.max_claimants} frei
+                        {job.maxClaimants - activeClaims}/{job.maxClaimants}{" "}
+                        frei
                       </div>
                     </CardContent>
                   </Card>

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -7,10 +8,10 @@ import { Clock, MapPin, Calendar, Users, User } from "lucide-react";
 import { JobActionButtons } from "./action-buttons";
 
 const urgencyLabels: Record<string, { label: string; class: string }> = {
-  low: { label: "Niedrig", class: "bg-sage-100 text-sage-700" },
-  normal: { label: "Normal", class: "bg-amber-100 text-amber-700" },
-  high: { label: "Dringend", class: "bg-coral-100 text-coral-700" },
-  critical: { label: "Kritisch", class: "bg-coral-500 text-white" },
+  LOW: { label: "Niedrig", class: "bg-sage-100 text-sage-700" },
+  NORMAL: { label: "Normal", class: "bg-amber-100 text-amber-700" },
+  HIGH: { label: "Dringend", class: "bg-coral-100 text-coral-700" },
+  CRITICAL: { label: "Kritisch", class: "bg-coral-500 text-white" },
 };
 
 export default async function JobDetailPage({
@@ -19,36 +20,32 @@ export default async function JobDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session!.user.id;
 
-  const { data: job } = await supabase
-    .from("jobs")
-    .select(
-      `
-      *,
-      kreise(name, slug, color),
-      users!posted_by(first_name, last_name, avatar_url),
-      job_claims(id, user_id, status, users(first_name, last_name))
-    `
-    )
-    .eq("id", id)
-    .single();
+  const job = await prisma.job.findUnique({
+    where: { id },
+    include: {
+      kreis: { select: { name: true, slug: true, color: true } },
+      poster: { select: { firstName: true, lastName: true, avatarUrl: true } },
+      claims: {
+        include: {
+          user: { select: { firstName: true, lastName: true } },
+        },
+      },
+    },
+  });
 
   if (!job) notFound();
 
-  const urgency = urgencyLabels[job.urgency] ?? urgencyLabels.normal;
-  const activeClaims =
-    (job.job_claims as { id: string; status: string; user_id: string }[])?.filter(
-      (c) => c.status === "claimed" || c.status === "completed"
-    ) ?? [];
-  const spotsLeft = job.max_claimants - activeClaims.length;
-  const userClaim = (
-    job.job_claims as { id: string; status: string; user_id: string }[]
-  )?.find((c) => c.user_id === user!.id && c.status === "claimed");
-  const poster = job.users as { first_name: string; last_name: string };
+  const urgency = urgencyLabels[job.urgency] ?? urgencyLabels.NORMAL;
+  const activeClaims = job.claims.filter(
+    (c) => c.status === "CLAIMED" || c.status === "COMPLETED"
+  );
+  const spotsLeft = job.maxClaimants - activeClaims.length;
+  const userClaim = job.claims.find(
+    (c) => c.userId === userId && c.status === "CLAIMED"
+  );
 
   return (
     <div className="space-y-6">
@@ -56,15 +53,11 @@ export default async function JobDetailPage({
       <div>
         <div className="flex gap-2 mb-2">
           <Badge className={urgency.class}>{urgency.label}</Badge>
-          {job.kreise && (
-            <Badge variant="secondary">
-              {(job.kreise as { name: string }).name}
-            </Badge>
-          )}
+          {job.kreis && <Badge variant="secondary">{job.kreis.name}</Badge>}
         </div>
         <h1 className="text-2xl font-heading font-extrabold">{job.title}</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Erstellt von {poster.first_name} {poster.last_name}
+          Erstellt von {job.poster.firstName} {job.poster.lastName}
         </p>
       </div>
 
@@ -74,7 +67,7 @@ export default async function JobDetailPage({
           <CardContent className="flex items-center gap-2 p-3">
             <Clock className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm">
-              ~{Number(job.estimated_hours).toString().replace(".", ",")} Std.
+              ~{Number(job.estimatedHours).toString().replace(".", ",")} Std.
             </span>
           </CardContent>
         </Card>
@@ -82,17 +75,17 @@ export default async function JobDetailPage({
           <CardContent className="flex items-center gap-2 p-3">
             <Users className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm">
-              {spotsLeft}/{job.max_claimants} frei
+              {spotsLeft}/{job.maxClaimants} frei
             </span>
           </CardContent>
         </Card>
-        {job.due_date && (
+        {job.dueDate && (
           <Card>
             <CardContent className="flex items-center gap-2 p-3">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">
                 Bis{" "}
-                {new Date(job.due_date).toLocaleDateString("de-DE", {
+                {new Date(job.dueDate).toLocaleDateString("de-DE", {
                   day: "numeric",
                   month: "short",
                 })}
@@ -121,13 +114,11 @@ export default async function JobDetailPage({
       )}
 
       {/* Skills needed */}
-      {job.skills_needed && job.skills_needed.length > 0 && (
+      {job.skillsNeeded && job.skillsNeeded.length > 0 && (
         <div>
-          <h2 className="font-heading font-bold mb-2">
-            Gesucht werden
-          </h2>
+          <h2 className="font-heading font-bold mb-2">Gesucht werden</h2>
           <div className="flex gap-2 flex-wrap">
-            {job.skills_needed.map((skill: string) => (
+            {job.skillsNeeded.map((skill: string) => (
               <Badge key={skill} variant="secondary">
                 {skill}
               </Badge>
@@ -141,35 +132,23 @@ export default async function JobDetailPage({
       {/* Claimants */}
       {activeClaims.length > 0 && (
         <div>
-          <h2 className="font-heading font-bold mb-2">
-            Uebernommen von
-          </h2>
+          <h2 className="font-heading font-bold mb-2">Uebernommen von</h2>
           <div className="space-y-2">
-            {activeClaims.map((claim) => {
-              const claimUser = (
-                claim as unknown as {
-                  users: { first_name: string; last_name: string };
-                }
-              ).users;
-              return (
-                <div
-                  key={(claim as { id: string }).id}
-                  className="flex items-center gap-2"
-                >
-                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                    <User className="h-4 w-4 text-amber-600" />
-                  </div>
-                  <span className="text-sm">
-                    {claimUser?.first_name} {claimUser?.last_name}
-                  </span>
-                  {(claim as { status: string }).status === "completed" && (
-                    <Badge variant="secondary" className="text-xs">
-                      Erledigt
-                    </Badge>
-                  )}
+            {activeClaims.map((claim) => (
+              <div key={claim.id} className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                  <User className="h-4 w-4 text-amber-600" />
                 </div>
-              );
-            })}
+                <span className="text-sm">
+                  {claim.user.firstName} {claim.user.lastName}
+                </span>
+                {claim.status === "COMPLETED" && (
+                  <Badge variant="secondary" className="text-xs">
+                    Erledigt
+                  </Badge>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       )}

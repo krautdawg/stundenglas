@@ -1,66 +1,65 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, Eye, EyeOff } from "lucide-react";
+import { Trophy, EyeOff } from "lucide-react";
 
 export default async function LeaderboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session!.user.id;
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("family_id")
-    .eq("id", user!.id)
-    .single();
+  const profile = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { familyId: true },
+  });
 
   // Get all families with their hours this year
   const startOfYear = new Date();
   startOfYear.setMonth(0, 1);
   startOfYear.setHours(0, 0, 0, 0);
 
-  const { data: families } = await supabase
-    .from("families")
-    .select("id, name, monthly_hour_target")
-    .eq("is_active", true);
+  const families = await prisma.family.findMany({
+    where: { isActive: true },
+    select: { id: true, name: true, monthlyHourTarget: true },
+  });
 
-  const { data: allHours } = await supabase
-    .from("volunteer_hours")
-    .select("family_id, hours")
-    .gte("date_performed", startOfYear.toISOString().split("T")[0]);
+  const allHours = await prisma.volunteerHour.findMany({
+    where: {
+      datePerformed: { gte: startOfYear },
+    },
+    select: { familyId: true, hours: true },
+  });
 
   // Get privacy modes
-  const { data: allUsers } = await supabase
-    .from("users")
-    .select("family_id, privacy_mode");
+  const allUsers = await prisma.user.findMany({
+    select: { familyId: true, privacyMode: true },
+  });
 
   // Build family privacy map (if any member has privacy_mode, family is private)
   const privacyMap: Record<string, boolean> = {};
-  allUsers?.forEach((u) => {
-    if (u.family_id && u.privacy_mode) {
-      privacyMap[u.family_id] = true;
+  allUsers.forEach((u) => {
+    if (u.familyId && u.privacyMode) {
+      privacyMap[u.familyId] = true;
     }
   });
 
   // Build hours per family
   const hoursMap: Record<string, number> = {};
-  allHours?.forEach((h) => {
-    hoursMap[h.family_id] = (hoursMap[h.family_id] || 0) + Number(h.hours);
+  allHours.forEach((h) => {
+    hoursMap[h.familyId] = (hoursMap[h.familyId] || 0) + Number(h.hours);
   });
 
   // Create leaderboard
-  const leaderboard =
-    families
-      ?.map((f) => ({
-        family_id: f.id,
-        family_name: f.name,
-        total_hours: hoursMap[f.id] || 0,
-        privacy_mode: privacyMap[f.id] || false,
-        monthly_target: f.monthly_hour_target,
-        is_own: f.id === profile?.family_id,
-      }))
-      .sort((a, b) => b.total_hours - a.total_hours) ?? [];
+  const leaderboard = families
+    .map((f) => ({
+      family_id: f.id,
+      family_name: f.name,
+      total_hours: hoursMap[f.id] || 0,
+      privacy_mode: privacyMap[f.id] || false,
+      monthly_target: f.monthlyHourTarget,
+      is_own: f.id === profile?.familyId,
+    }))
+    .sort((a, b) => b.total_hours - a.total_hours);
 
   const maxHours = leaderboard[0]?.total_hours || 1;
 
@@ -124,8 +123,8 @@ export default async function LeaderboardPage() {
               entry.is_own
                 ? "border-primary bg-amber-50"
                 : index < 3
-                ? "bg-amber-50/50"
-                : ""
+                  ? "bg-amber-50/50"
+                  : ""
             }
           >
             <CardContent className="flex items-center gap-4 p-4">
@@ -140,9 +139,7 @@ export default async function LeaderboardPage() {
                 <div className="flex items-center gap-2">
                   <span
                     className={`font-medium truncate ${
-                      entry.privacy_mode
-                        ? "text-muted-foreground italic"
-                        : ""
+                      entry.privacy_mode ? "text-muted-foreground italic" : ""
                     }`}
                   >
                     {entry.privacy_mode ? "Anonyme Familie" : entry.family_name}
