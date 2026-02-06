@@ -17,7 +17,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Foerderkreis - Schule des Lebens",
+  title: "Schule des Lebens",
   description:
     "Ehrenamtliche Stunden erfassen und Aufgaben finden fuer die Schulgemeinschaft",
   manifest: "/manifest.json",

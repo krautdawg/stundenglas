@@ -49,10 +49,10 @@ export default function LoginPage() {
             🌳
           </div>
           <h1 className="text-2xl font-heading font-extrabold text-foreground">
-            Foerderkreis
+            Schule des Lebens
           </h1>
           <p className="text-muted-foreground mt-1">
-            Schule des Lebens &middot; Kloster Lehnin
+            Foerderkreis &middot; Kloster Lehnin
           </p>
         </div>
 
