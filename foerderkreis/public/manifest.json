@@ -1,0 +1,24 @@
+{
+  "name": "Foerderkreis - Schule des Lebens",
+  "short_name": "Foerderkreis",
+  "description": "Ehrenamtliche Stunden erfassen und Aufgaben finden",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#FDFCFB",
+  "theme_color": "#E8891C",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

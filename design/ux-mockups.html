@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foerderkreis – UX Mockups &amp; Flows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#E8891C;--primary-light:#F5A84D;--primary-pale:#FFF3E0;
+  --secondary:#4A8E50;--secondary-light:#6DB873;--secondary-pale:#E8F5E9;
+  --accent:#E8644A;--accent-light:#F08D78;--accent-pale:#FDEAE6;
+  --bg:#FDFCFB;--bg-warm:#F7F5F3;--bg-muted:#EDEAE6;--bg-dark:#D9D4CE;
+  --text:#3D3529;--text-mid:#6B6357;--text-light:#9B9488;
+  --white:#FFFFFF;--shadow:0 2px 12px rgba(61,53,41,.08);
+  --shadow-lg:0 8px 32px rgba(61,53,41,.12);
+  --radius:14px;--radius-sm:10px;--radius-lg:20px;
+  --font-heading:'Nunito',sans-serif;--font-body:'Inter',sans-serif;
+  --phone-w:375px;--phone-h:667px;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font-body);color:var(--text);background:var(--bg);line-height:1.6}
+
+/* ── Sidebar / TOC ── */
+.sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--white);
+  border-right:1px solid var(--bg-muted);padding:24px 16px;overflow-y:auto;z-index:100;
+  box-shadow:2px 0 16px rgba(61,53,41,.05)}
+.sidebar h2{font-family:var(--font-heading);font-size:1.1rem;color:var(--primary);
+  margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--primary-pale)}
+.sidebar .toc-section{margin-bottom:14px}
+.sidebar .toc-section-title{font-family:var(--font-heading);font-size:.75rem;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);margin-bottom:6px;padding-left:8px}
+.sidebar a{display:block;padding:6px 10px;border-radius:var(--radius-sm);
+  color:var(--text-mid);text-decoration:none;font-size:.82rem;transition:all .2s}
+.sidebar a:hover{background:var(--primary-pale);color:var(--primary)}
+.sidebar a.active{background:var(--primary);color:var(--white);font-weight:600}
+
+/* ── Main content ── */
+.main{margin-left:260px;padding:40px 48px 80px}
+.page-title{font-family:var(--font-heading);font-size:2.4rem;font-weight:800;
+  color:var(--text);margin-bottom:8px}
+.page-subtitle{font-size:1.05rem;color:var(--text-mid);margin-bottom:48px;max-width:640px}
+
+/* ── Section headers ── */
+.section{margin-bottom:72px;scroll-margin-top:32px}
+.section-label{font-family:var(--font-heading);font-size:.75rem;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--primary);margin-bottom:6px}
+.section-title{font-family:var(--font-heading);font-size:1.7rem;font-weight:700;
+  color:var(--text);margin-bottom:8px}
+.section-desc{color:var(--text-mid);font-size:.92rem;margin-bottom:32px;max-width:600px}
+
+/* ── Flow diagrams ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;padding:28px 24px;
+  background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);
+  margin-bottom:24px;overflow-x:auto}
+.flow-step{display:flex;flex-direction:column;align-items:center;text-align:center;
+  min-width:110px;max-width:140px;flex-shrink:0}
+.flow-step .step-box{width:110px;min-height:62px;display:flex;align-items:center;
+  justify-content:center;padding:10px 8px;border-radius:var(--radius);font-size:.78rem;
+  font-weight:600;line-height:1.3;transition:transform .2s}
+.flow-step .step-box:hover{transform:translateY(-2px)}
+.flow-step .step-num{font-size:.65rem;color:var(--text-light);margin-top:6px}
+.step-start .step-box{background:var(--primary);color:var(--white)}
+.step-action .step-box{background:var(--primary-pale);color:var(--primary);border:2px solid var(--primary-light)}
+.step-decision .step-box{background:var(--accent-pale);color:var(--accent);border:2px solid var(--accent-light);
+  border-radius:4px;transform:rotate(0deg)}
+.step-end .step-box{background:var(--secondary);color:var(--white)}
+.step-mid .step-box{background:var(--bg-warm);color:var(--text);border:2px solid var(--bg-muted)}
+.flow-arrow{display:flex;align-items:center;justify-content:center;width:40px;
+  flex-shrink:0;color:var(--bg-dark);font-size:1.4rem;font-weight:700}
+
+/* ── Phone frame ── */
+.phones-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:48px}
+.phone-wrap{display:flex;flex-direction:column;align-items:center}
+.phone-label{font-family:var(--font-heading);font-weight:700;font-size:1rem;color:var(--text);margin-bottom:4px}
+.phone-label-sub{font-size:.8rem;color:var(--text-light);margin-bottom:16px;text-align:center}
+.phone{width:var(--phone-w);height:var(--phone-h);border-radius:40px;background:var(--white);
+  box-shadow:var(--shadow-lg),0 0 0 2px var(--bg-muted);overflow:hidden;display:flex;
+  flex-direction:column;position:relative}
+
+/* status bar */
+.status-bar{height:44px;background:var(--white);display:flex;align-items:flex-end;
+  justify-content:space-between;padding:0 24px 6px;font-size:.7rem;font-weight:600;
+  color:var(--text);flex-shrink:0;border-bottom:1px solid var(--bg-warm)}
+.status-left{display:flex;gap:4px;align-items:center}
+.status-right{display:flex;gap:6px;align-items:center}
+
+/* phone content */
+.phone-content{flex:1;overflow-y:auto;background:var(--bg)}
+.phone-content::-webkit-scrollbar{width:0}
+
+/* bottom nav */
+.bottom-nav{height:56px;background:var(--white);border-top:1px solid var(--bg-muted);
+  display:flex;align-items:center;justify-content:space-around;flex-shrink:0;padding:0 4px}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:.6rem;color:var(--text-light);text-decoration:none;padding:4px 8px;
+  border-radius:8px;transition:all .15s;min-width:52px}
+.nav-item.active{color:var(--primary);font-weight:700}
+.nav-item.active .nav-icon{background:var(--primary-pale);color:var(--primary)}
+.nav-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;border-radius:8px}
+
+/* ── Reusable phone-inner components ── */
+.p-header{padding:16px 20px 12px;background:var(--white);border-bottom:1px solid var(--bg-warm)}
+.p-header h1{font-family:var(--font-heading);font-size:1.2rem;font-weight:700;color:var(--text)}
+.p-header-sub{font-size:.78rem;color:var(--text-light);margin-top:2px}
+.p-body{padding:16px 20px}
+.p-card{background:var(--white);border-radius:var(--radius);padding:14px;
+  box-shadow:0 1px 4px rgba(61,53,41,.06);margin-bottom:12px}
+.p-btn{display:block;width:100%;padding:14px;border:none;border-radius:var(--radius);
+  font-family:var(--font-heading);font-size:.92rem;font-weight:700;cursor:pointer;text-align:center}
+.p-btn-primary{background:var(--primary);color:var(--white)}
+.p-btn-secondary{background:var(--secondary);color:var(--white)}
+.p-btn-outline{background:transparent;color:var(--primary);border:2px solid var(--primary)}
+.p-btn-sm{padding:8px 16px;font-size:.78rem;width:auto;display:inline-block}
+.p-input{width:100%;padding:12px 14px;border:2px solid var(--bg-muted);border-radius:var(--radius-sm);
+  font-family:var(--font-body);font-size:.85rem;color:var(--text);background:var(--white);outline:none}
+.p-input:focus{border-color:var(--primary)}
+.p-input-label{font-size:.75rem;font-weight:600;color:var(--text-mid);margin-bottom:6px;display:block}
+.p-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.65rem;font-weight:600}
+.p-badge-amber{background:var(--primary-pale);color:var(--primary)}
+.p-badge-green{background:var(--secondary-pale);color:var(--secondary)}
+.p-badge-coral{background:var(--accent-pale);color:var(--accent)}
+.p-badge-muted{background:var(--bg-muted);color:var(--text-mid)}
+.p-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-weight:700;font-size:.8rem;color:var(--white);flex-shrink:0}
+.p-divider{height:1px;background:var(--bg-muted);margin:12px 0}
+
+/* progress ring */
+.progress-ring-wrap{position:relative;width:100px;height:100px;margin:0 auto}
+.progress-ring-wrap svg{transform:rotate(-90deg)}
+.progress-ring-bg{fill:none;stroke:var(--bg-muted);stroke-width:8}
+.progress-ring-fg{fill:none;stroke:var(--primary);stroke-width:8;stroke-linecap:round;
+  transition:stroke-dashoffset .6s}
+.progress-ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center}
+.progress-ring-text .val{font-family:var(--font-heading);font-size:1.3rem;font-weight:800;color:var(--text)}
+.progress-ring-text .lbl{font-size:.6rem;color:var(--text-light)}
+
+/* stepper */
+.stepper{display:flex;align-items:center;gap:12px}
+.stepper-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--primary);
+  background:var(--white);color:var(--primary);font-size:1.1rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;cursor:pointer}
+.stepper-val{font-family:var(--font-heading);font-size:1.5rem;font-weight:800;color:var(--text);min-width:80px;text-align:center}
+
+/* urgency dots */
+.urgency{display:flex;gap:3px;align-items:center}
+.urgency-dot{width:8px;height:8px;border-radius:50%}
+.urgency-dot.filled{background:var(--accent)}
+.urgency-dot.empty{background:var(--bg-muted)}
+
+/* leaderboard */
+.lb-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bg-warm)}
+.lb-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-weight:700;font-size:.75rem;flex-shrink:0}
+.lb-gold{background:#FFD700;color:#6B5900}
+.lb-silver{background:#C0C0C0;color:#4A4A4A}
+.lb-bronze{background:#CD7F32;color:#fff}
+.lb-normal{background:var(--bg-muted);color:var(--text-mid)}
+.lb-bar-wrap{flex:1;height:8px;background:var(--bg-muted);border-radius:4px;overflow:hidden}
+.lb-bar{height:100%;border-radius:4px}
+
+/* toggle */
+.toggle-wrap{display:flex;align-items:center;gap:10px}
+.toggle{width:44px;height:24px;border-radius:12px;position:relative;cursor:pointer;transition:background .2s}
+.toggle.off{background:var(--bg-muted)}
+.toggle.on{background:var(--secondary)}
+.toggle::after{content:'';position:absolute;top:2px;width:20px;height:20px;border-radius:50%;
+  background:var(--white);transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle.off::after{left:2px}
+.toggle.on::after{left:22px}
+
+/* admin table */
+.admin-table{width:100%;border-collapse:collapse;font-size:.7rem}
+.admin-table th{text-align:left;padding:6px 4px;font-weight:600;color:var(--text-light);
+  border-bottom:2px solid var(--bg-muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.04em}
+.admin-table td{padding:6px 4px;border-bottom:1px solid var(--bg-warm);color:var(--text)}
+
+/* filter bar */
+.filter-bar{display:flex;gap:6px;padding:0 0 12px;overflow-x:auto}
+.filter-chip{padding:6px 12px;border-radius:20px;font-size:.72rem;font-weight:600;
+  border:1.5px solid var(--bg-muted);color:var(--text-mid);white-space:nowrap;cursor:pointer}
+.filter-chip.active{background:var(--primary);color:var(--white);border-color:var(--primary)}
+
+/* skill tags */
+.skill-tags{display:flex;flex-wrap:wrap;gap:6px}
+.skill-tag{padding:4px 10px;border-radius:20px;font-size:.68rem;font-weight:500;
+  background:var(--bg-warm);color:var(--text-mid);border:1px solid var(--bg-muted)}
+.skill-tag.selected{background:var(--primary-pale);color:var(--primary);border-color:var(--primary-light)}
+
+/* Kreis grid */
+.kreis-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kreis-card{background:var(--white);border-radius:var(--radius);padding:14px 10px;
+  text-align:center;box-shadow:0 1px 4px rgba(61,53,41,.06)}
+.kreis-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:1.2rem;margin:0 auto 8px}
+.kreis-name{font-family:var(--font-heading);font-weight:700;font-size:.82rem;color:var(--text)}
+.kreis-meta{font-size:.65rem;color:var(--text-light);margin-top:2px}
+
+/* Quick-action buttons */
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.qa-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;
+  border-radius:var(--radius);background:var(--white);box-shadow:0 1px 4px rgba(61,53,41,.06);
+  text-align:center;cursor:pointer;border:none}
+.qa-btn .qa-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:1rem}
+.qa-btn .qa-label{font-size:.72rem;font-weight:600;color:var(--text)}
+
+/* activity feed */
+.activity-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg-warm)}
+.activity-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.activity-text{font-size:.75rem;color:var(--text)}
+.activity-time{font-size:.65rem;color:var(--text-light)}
+
+/* onboarding card choices */
+.choice-cards{display:flex;flex-direction:column;gap:12px}
+.choice-card{background:var(--white);border:2px solid var(--bg-muted);border-radius:var(--radius);
+  padding:20px 16px;text-align:center;cursor:pointer;transition:all .2s}
+.choice-card:hover{border-color:var(--primary);background:var(--primary-pale)}
+.choice-card .cc-icon{font-size:1.8rem;margin-bottom:8px}
+.choice-card .cc-title{font-family:var(--font-heading);font-weight:700;font-size:.92rem;color:var(--text)}
+.choice-card .cc-desc{font-size:.75rem;color:var(--text-mid);margin-top:4px}
+
+/* avatar upload */
+.avatar-upload{width:80px;height:80px;border-radius:50%;background:var(--bg-muted);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
+  border:3px dashed var(--bg-dark);cursor:pointer;font-size:1.4rem;color:var(--text-light)}
+
+/* claimant */
+.claimant-row{display:flex;align-items:center;gap:8px;padding:6px 0}
+.claimant-row .p-avatar{width:28px;height:28px;font-size:.65rem}
+
+/* stats grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-card{background:var(--white);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.stat-card .stat-val{font-family:var(--font-heading);font-size:1.4rem;font-weight:800}
+.stat-card .stat-lbl{font-size:.62rem;color:var(--text-light);margin-top:2px}
+
+@media(max-width:900px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:24px 16px 60px}
+  .phones-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ SIDEBAR / TOC ════════════════════ -->
+<nav class="sidebar">
+  <h2>Foerderkreis UX</h2>
+
+  <div class="toc-section">
+    <div class="toc-section-title">UX Flows</div>
+    <a href="#flow-onboarding">1. Onboarding Flow</a>
+    <a href="#flow-log-hours">2. Stunden erfassen</a>
+    <a href="#flow-claim-job">3. Aufgabe beanspruchen</a>
+    <a href="#flow-post-job">4. Aufgabe erstellen</a>
+    <a href="#flow-join-kreis">5. Kreis beitreten</a>
+    <a href="#flow-leaderboard">6. Rangliste</a>
+  </div>
+
+  <div class="toc-section">
+    <div class="toc-section-title">Bildschirme</div>
+    <a href="#screen-login">1. Login</a>
+    <a href="#screen-onboard1">2. Onboarding 1</a>
+    <a href="#screen-onboard2">3. Onboarding 2</a>
+    <a href="#screen-onboard3">4. Onboarding 3</a>
+    <a href="#screen-dashboard">5. Dashboard</a>
+    <a href="#screen-log-hours">6. Stunden erfassen</a>
+    <a href="#screen-my-hours">7. Meine Stunden</a>
+    <a href="#screen-marketplace">8. Marktplatz</a>
+    <a href="#screen-job-detail">9. Aufgabe Detail</a>
+    <a href="#screen-post-job">10. Angebot erstellen</a>
+    <a href="#screen-kreise">11. Kreise Uebersicht</a>
+    <a href="#screen-kreis-detail">12. Kreis Detail</a>
+    <a href="#screen-leaderboard">13. Rangliste</a>
+    <a href="#screen-profil">14. Mein Profil</a>
+    <a href="#screen-admin">15. Admin Dashboard</a>
+  </div>
+</nav>
+
+<!-- ════════════════════ MAIN CONTENT ════════════════════ -->
+<div class="main">
+
+<h1 class="page-title">Foerderkreis UX Mockups</h1>
+<p class="page-subtitle">Schule des Lebens – Eltern-Freiwilligen-Tracking-App. Komplette UX-Flows und mobile Bildschirm-Mockups.</p>
+
+<!-- ════════════════════ PART 2: FLOW DIAGRAMS ════════════════════ -->
+
+<!-- Flow 1: Onboarding -->
+<div class="section" id="flow-onboarding">
+  <div class="section-label">UX Flow 1</div>
+  <h2 class="section-title">Onboarding Flow</h2>
+  <p class="section-desc">Vom Magic Link bis zum Dashboard – der erste Kontakt neuer Eltern mit der App.</p>
+  <div class="flow">
+    <div class="flow-step step-start"><div class="step-box">Magic Link E-Mail senden</div><div class="step-num">Schritt 1</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">Link in E-Mail klicken</div><div class="step-num">Schritt 2</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-decision"><div class="step-box">Familie erstellen / beitreten</div><div class="step-num">Schritt 3</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">Profil vervoll&shy;staendigen</div><div class="step-num">Schritt 4</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-mid"><div class="step-box">Einem Kreis beitreten</div><div class="step-num">Schritt 5</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-end"><div class="step-box">Dashboard</div><div class="step-num">Schritt 6</div></div>
+  </div>
+</div>
+
+<!-- Flow 2: Log Hours -->
+<div class="section" id="flow-log-hours">
+  <div class="section-label">UX Flow 2</div>
+  <h2 class="section-title">Stunden erfassen</h2>
+  <p class="section-desc">Schnelles Eintragen von Freiwilligenstunden in wenigen Sekunden.</p>
+  <div class="flow">
+    <div class="flow-step step-start"><div class="step-box">&bdquo;Stunden&ldquo; antippen</div><div class="step-num">Schritt 1</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">Formular ausfuellen (Datum, Stunden, Beschreibung)</div><div class="step-num">Schritt 2</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-mid"><div class="step-box">Kreis auswaehlen</div><div class="step-num">Schritt 3</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">Absenden</div><div class="step-num">Schritt 4</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-end"><div class="step-box">Im Dashboard sichtbar</div><div class="step-num">Schritt 5</div></div>
+  </div>
+</div>
+
+<!-- Flow 3: Claim Job -->
+<div class="section" id="flow-claim-job">
+  <div class="section-label">UX Flow 3</div>
+  <h2 class="section-title">Aufgabe beanspruchen</h2>
+  <p class="section-desc">Eine Aufgabe vom Marktplatz uebernehmen und Stunden automatisch gutschreiben lassen.</p>
+  <div class="flow">
+    <div class="flow-step step-start"><div class="step-box">Marktplatz durchsuchen</div><div class="step-num">Schritt 1</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">Nach Kreis / Dringlichkeit filtern</div><div class="step-num">Schritt 2</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-mid"><div class="step-box">Aufgabe antippen</div><div class="step-num">Schritt 3</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">&bdquo;Ich mache das!&ldquo;</div><div class="step-num">Schritt 4</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-mid"><div class="step-box">Aufgabe erledigen</div><div class="step-num">Schritt 5</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-end"><div class="step-box">Stunden auto&shy;matisch erfasst</div><div class="step-num">Schritt 6</div></div>
+  </div>
+</div>
+
+<!-- Flow 4: Post Job -->
+<div class="section" id="flow-post-job">
+  <div class="section-label">UX Flow 4</div>
+  <h2 class="section-title">Aufgabe erstellen</h2>
+  <p class="section-desc">Eine neue Aufgabe fuer den Marktplatz erstellen und veroeffentlichen.</p>
+  <div class="flow">
+    <div class="flow-step step-start"><div class="step-box">&bdquo;+&ldquo; antippen</div><div class="step-num">Schritt 1</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">Formular ausfuellen (Titel, Beschreibung, Stunden)</div><div class="step-num">Schritt 2</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-mid"><div class="step-box">Kreis, Dringlichkeit, Faellig&shy;keit</div><div class="step-num">Schritt 3</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">&bdquo;Aufgabe posten&ldquo;</div><div class="step-num">Schritt 4</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-end"><div class="step-box">Im Marktplatz sichtbar</div><div class="step-num">Schritt 5</div></div>
+  </div>
+</div>
+
+<!-- Flow 5: Join Kreis -->
+<div class="section" id="flow-join-kreis">
+  <div class="section-label">UX Flow 5</div>
+  <h2 class="section-title">Kreis beitreten</h2>
+  <p class="section-desc">Einem Arbeitskreis beitreten und dessen Mitglieder und Aufgaben sehen.</p>
+  <div class="flow">
+    <div class="flow-step step-start"><div class="step-box">Kreise durchsuchen</div><div class="step-num">Schritt 1</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">Kreis antippen</div><div class="step-num">Schritt 2</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-mid"><div class="step-box">Mitglieder &amp; Aufgaben sehen</div><div class="step-num">Schritt 3</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">&bdquo;Beitreten&ldquo;</div><div class="step-num">Schritt 4</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-end"><div class="step-box">Mitgliedschaft bestaetigt</div><div class="step-num">Schritt 5</div></div>
+  </div>
+</div>
+
+<!-- Flow 6: Leaderboard -->
+<div class="section" id="flow-leaderboard">
+  <div class="section-label">UX Flow 6</div>
+  <h2 class="section-title">Rangliste</h2>
+  <p class="section-desc">Familien-Ranking einsehen und Datenschutz-Modus aktivieren.</p>
+  <div class="flow">
+    <div class="flow-step step-start"><div class="step-box">Rangliste aufrufen</div><div class="step-num">Schritt 1</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-action"><div class="step-box">Familien&shy;position sehen</div><div class="step-num">Schritt 2</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-decision"><div class="step-box">Datenschutz-Modus umschalten</div><div class="step-num">Schritt 3</div></div>
+    <div class="flow-arrow">&#10132;</div>
+    <div class="flow-step step-end"><div class="step-box">Anonyme Anzeige</div><div class="step-num">Schritt 4</div></div>
+  </div>
+</div>
+
+<!-- ════════════════════ PART 3: PHONE MOCKUPS ════════════════════ -->
+
+<div style="margin-top:64px;margin-bottom:48px">
+  <div class="section-label">Teil 3</div>
+  <h2 class="section-title" style="font-size:2rem">Mobile Bildschirm-Mockups</h2>
+  <p class="section-desc">15 vollstaendige Bildschirme in realistischen Handy-Rahmen (375 &times; 667 px).</p>
+</div>
+
+<div class="phones-grid">
+
+
+<!-- ──────── SCREEN 1: LOGIN ──────── -->
+<div class="phone-wrap" id="screen-login">
+  <div class="phone-label">1. Login</div>
+  <div class="phone-label-sub">Magic Link Anmeldung</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content" style="background:var(--white)">
+      <div style="padding:40px 24px 24px;text-align:center">
+        <!-- Logo placeholder -->
+        <div style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--primary),var(--primary-light));margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--white);font-weight:800;font-family:var(--font-heading)">F</div>
+        <h1 style="font-family:var(--font-heading);font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:4px">Willkommen beim<br>Foerderkreis</h1>
+        <p style="font-size:.8rem;color:var(--text-light);margin-bottom:32px">Schule des Lebens – Elternportal</p>
+
+        <!-- Illustration placeholder -->
+        <div style="width:160px;height:100px;border-radius:var(--radius);background:var(--primary-pale);margin:0 auto 28px;display:flex;align-items:center;justify-content:center;flex-direction:column">
+          <span style="font-size:2.2rem">&#127793;</span>
+          <span style="font-size:.65rem;color:var(--primary);font-weight:600;margin-top:4px">Gemeinsam wachsen</span>
+        </div>
+
+        <div style="text-align:left;margin-bottom:16px">
+          <label class="p-input-label">E-Mail-Adresse</label>
+          <input class="p-input" type="email" placeholder="eltern@beispiel.de" style="background:var(--bg-warm)">
+        </div>
+        <button class="p-btn p-btn-primary" style="margin-bottom:12px">Magic Link senden</button>
+        <p style="font-size:.7rem;color:var(--text-light);text-align:center;line-height:1.5">
+          Wir senden Ihnen einen sicheren Anmeldelink.<br>Kein Passwort erforderlich.
+        </p>
+      </div>
+    </div>
+    <!-- No bottom nav on login -->
+  </div>
+</div>
+
+<!-- ──────── SCREEN 2: ONBOARDING STEP 1 ──────── -->
+<div class="phone-wrap" id="screen-onboard1">
+  <div class="phone-label">2. Onboarding – Schritt 1</div>
+  <div class="phone-label-sub">Familie erstellen oder beitreten</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:42</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content" style="background:var(--bg)">
+      <div style="padding:20px 20px 8px">
+        <p style="font-size:.72rem;color:var(--primary);font-weight:700;margin-bottom:4px">SCHRITT 1 VON 3</p>
+        <h1 style="font-family:var(--font-heading);font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:4px">Familie erstellen oder beitreten</h1>
+        <p style="font-size:.78rem;color:var(--text-mid);margin-bottom:20px">Waehlen Sie, ob Sie eine neue Familie anlegen oder einer bestehenden beitreten moechten.</p>
+      </div>
+      <div class="choice-cards" style="padding:0 20px">
+        <div class="choice-card" style="border-color:var(--primary);background:var(--primary-pale)">
+          <div class="cc-icon">&#127968;</div>
+          <div class="cc-title">Neue Familie erstellen</div>
+          <div class="cc-desc">Legen Sie einen Familien-Account an und laden Sie weitere Mitglieder ein.</div>
+        </div>
+        <div class="choice-card">
+          <div class="cc-icon">&#128279;</div>
+          <div class="cc-title">Bestehender Familie beitreten</div>
+          <div class="cc-desc">Geben Sie den Einladungscode ein, den Sie erhalten haben.</div>
+        </div>
+      </div>
+      <div style="padding:16px 20px">
+        <label class="p-input-label">Einladungscode</label>
+        <input class="p-input" placeholder="z.B. FAMILIE-2024-XK9" style="background:var(--white)">
+      </div>
+      <div style="padding:0 20px 20px">
+        <button class="p-btn p-btn-primary">Weiter</button>
+      </div>
+    </div>
+    <!-- No bottom nav during onboarding -->
+  </div>
+</div>
+
+<!-- ──────── SCREEN 3: ONBOARDING STEP 2 ──────── -->
+<div class="phone-wrap" id="screen-onboard2">
+  <div class="phone-label">3. Onboarding – Schritt 2</div>
+  <div class="phone-label-sub">Profil vervollstaendigen</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:43</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content" style="background:var(--bg)">
+      <div style="padding:20px 20px 8px">
+        <p style="font-size:.72rem;color:var(--primary);font-weight:700;margin-bottom:4px">SCHRITT 2 VON 3</p>
+        <h1 style="font-family:var(--font-heading);font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:16px">Profil vervollstaendigen</h1>
+      </div>
+      <div style="padding:0 20px">
+        <div class="avatar-upload">&#128247;</div>
+        <p style="text-align:center;font-size:.7rem;color:var(--text-light);margin-bottom:20px">Foto hochladen</p>
+        <div style="margin-bottom:14px">
+          <label class="p-input-label">Vorname</label>
+          <input class="p-input" value="Sarah" style="background:var(--white)">
+        </div>
+        <div style="margin-bottom:14px">
+          <label class="p-input-label">Nachname</label>
+          <input class="p-input" value="Mueller" style="background:var(--white)">
+        </div>
+        <div style="margin-bottom:14px">
+          <label class="p-input-label">Kurze Beschreibung</label>
+          <textarea class="p-input" rows="2" style="background:var(--white);resize:none" placeholder="Erzaehlen Sie etwas ueber sich...">Mutter von zwei Kindern, Klasse 2a und 4b.</textarea>
+        </div>
+        <div style="margin-bottom:16px">
+          <label class="p-input-label">Faehigkeiten</label>
+          <div class="skill-tags">
+            <span class="skill-tag selected">Garten</span>
+            <span class="skill-tag selected">Kochen</span>
+            <span class="skill-tag">Handwerk</span>
+            <span class="skill-tag">IT</span>
+            <span class="skill-tag">Design</span>
+            <span class="skill-tag">Organisation</span>
+            <span class="skill-tag">Finanzen</span>
+          </div>
+        </div>
+        <button class="p-btn p-btn-primary">Weiter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── SCREEN 4: ONBOARDING STEP 3 ──────── -->
+<div class="phone-wrap" id="screen-onboard3">
+  <div class="phone-label">4. Onboarding – Schritt 3</div>
+  <div class="phone-label-sub">Einem Kreis beitreten</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:44</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content" style="background:var(--bg)">
+      <div style="padding:20px 20px 8px">
+        <p style="font-size:.72rem;color:var(--primary);font-weight:700;margin-bottom:4px">SCHRITT 3 VON 3</p>
+        <h1 style="font-family:var(--font-heading);font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:4px">Einem Kreis beitreten</h1>
+        <p style="font-size:.78rem;color:var(--text-mid);margin-bottom:16px">Waehlen Sie mindestens einen Arbeitskreis, der Sie interessiert.</p>
+      </div>
+      <div style="padding:0 20px 20px">
+        <div class="kreis-grid">
+          <div class="kreis-card" style="border:2px solid var(--secondary)">
+            <div class="kreis-icon" style="background:var(--secondary-pale)">&#127793;</div>
+            <div class="kreis-name">Garten</div>
+            <div class="kreis-meta">12 Mitglieder</div>
+            <div style="margin-top:8px"><span class="p-badge p-badge-green">Beigetreten</span></div>
+          </div>
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:#E8EAF6">&#128187;</div>
+            <div class="kreis-name">IT</div>
+            <div class="kreis-meta">5 Mitglieder</div>
+            <div style="margin-top:8px"><button class="p-btn p-btn-outline p-btn-sm" style="font-size:.65rem;padding:5px 12px">Beitreten</button></div>
+          </div>
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:var(--accent-pale)">&#127878;</div>
+            <div class="kreis-name">Veranstaltung</div>
+            <div class="kreis-meta">18 Mitglieder</div>
+            <div style="margin-top:8px"><button class="p-btn p-btn-outline p-btn-sm" style="font-size:.65rem;padding:5px 12px">Beitreten</button></div>
+          </div>
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:#FFF3E0">&#128296;</div>
+            <div class="kreis-name">Bau</div>
+            <div class="kreis-meta">8 Mitglieder</div>
+            <div style="margin-top:8px"><button class="p-btn p-btn-outline p-btn-sm" style="font-size:.65rem;padding:5px 12px">Beitreten</button></div>
+          </div>
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:#E8F5E9">&#128176;</div>
+            <div class="kreis-name">Finanzen</div>
+            <div class="kreis-meta">4 Mitglieder</div>
+            <div style="margin-top:8px"><button class="p-btn p-btn-outline p-btn-sm" style="font-size:.65rem;padding:5px 12px">Beitreten</button></div>
+          </div>
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:#FFF8E1">&#127859;</div>
+            <div class="kreis-name">Kueche</div>
+            <div class="kreis-meta">9 Mitglieder</div>
+            <div style="margin-top:8px"><button class="p-btn p-btn-outline p-btn-sm" style="font-size:.65rem;padding:5px 12px">Beitreten</button></div>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="p-btn p-btn-primary">Fertig – zum Dashboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── SCREEN 5: DASHBOARD ──────── -->
+<div class="phone-wrap" id="screen-dashboard">
+  <div class="phone-label">5. Dashboard</div>
+  <div class="phone-label-sub">Hauptbildschirm</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content">
+      <div style="padding:16px 20px 12px;background:var(--white)">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <h1 style="font-family:var(--font-heading);font-size:1.3rem;font-weight:800;color:var(--text)">Hallo, Sarah!</h1>
+            <p style="font-size:.75rem;color:var(--text-light)">November 2024 &middot; Familie Mueller</p>
+          </div>
+          <div class="p-avatar" style="background:var(--primary);width:40px;height:40px;font-size:.9rem">SM</div>
+        </div>
+      </div>
+      <div class="p-body">
+        <!-- Progress ring -->
+        <div class="p-card" style="text-align:center;padding:20px">
+          <div class="progress-ring-wrap">
+            <svg width="100" height="100" viewBox="0 0 100 100">
+              <circle class="progress-ring-bg" cx="50" cy="50" r="42"/>
+              <circle class="progress-ring-fg" cx="50" cy="50" r="42" stroke-dasharray="263.9" stroke-dashoffset="79.2"/>
+            </svg>
+            <div class="progress-ring-text">
+              <div class="val">7,0</div>
+              <div class="lbl">von 10 Std.</div>
+            </div>
+          </div>
+          <p style="font-size:.75rem;color:var(--text-mid);margin-top:10px">Noch <strong>3,0 Stunden</strong> bis zum Monatsziel</p>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="quick-actions">
+          <div class="qa-btn">
+            <div class="qa-icon" style="background:var(--primary-pale);color:var(--primary)">&#9201;</div>
+            <div class="qa-label">Stunden erfassen</div>
+          </div>
+          <div class="qa-btn">
+            <div class="qa-icon" style="background:var(--secondary-pale);color:var(--secondary)">&#128270;</div>
+            <div class="qa-label">Aufgabe finden</div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:10px;text-align:center">
+            <div style="font-family:var(--font-heading);font-weight:800;font-size:1.1rem;color:var(--primary)">7,0</div>
+            <div style="font-size:.6rem;color:var(--text-light)">Std. Nov</div>
+          </div>
+          <div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:10px;text-align:center">
+            <div style="font-family:var(--font-heading);font-weight:800;font-size:1.1rem;color:var(--secondary)">42,5</div>
+            <div style="font-size:.6rem;color:var(--text-light)">Std. gesamt</div>
+          </div>
+          <div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:10px;text-align:center">
+            <div style="font-family:var(--font-heading);font-weight:800;font-size:1.1rem;color:var(--accent)">#4</div>
+            <div style="font-size:.6rem;color:var(--text-light)">Rangplatz</div>
+          </div>
+        </div>
+
+        <!-- Activity feed -->
+        <div class="p-card">
+          <div style="font-family:var(--font-heading);font-weight:700;font-size:.82rem;color:var(--text);margin-bottom:8px">Letzte Aktivitaeten</div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--primary)"></div>
+            <div>
+              <div class="activity-text"><strong>2,0 Std.</strong> fuer Gartenarbeit erfasst</div>
+              <div class="activity-time">Heute, 14:30</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--secondary)"></div>
+            <div>
+              <div class="activity-text">Aufgabe &bdquo;Herbstfest Deko&ldquo; uebernommen</div>
+              <div class="activity-time">Gestern, 09:15</div>
+            </div>
+          </div>
+          <div class="activity-item" style="border:none">
+            <div class="activity-dot" style="background:var(--accent)"></div>
+            <div>
+              <div class="activity-text"><strong>3,0 Std.</strong> fuer IT-Support erfasst</div>
+              <div class="activity-time">Mo, 04. Nov</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item active" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ──────── SCREEN 6: STUNDEN ERFASSEN ──────── -->
+<div class="phone-wrap" id="screen-log-hours">
+  <div class="phone-label">6. Stunden erfassen</div>
+  <div class="phone-label-sub">Schnelles Stundenformular</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content">
+      <div class="p-header">
+        <h1>Stunden erfassen</h1>
+        <div class="p-header-sub">Tragen Sie Ihre Freiwilligenstunden ein</div>
+      </div>
+      <div class="p-body">
+        <div class="p-card" style="padding:20px">
+          <!-- Date -->
+          <div style="margin-bottom:18px">
+            <label class="p-input-label">Datum</label>
+            <input class="p-input" type="text" value="06.11.2024 (Heute)" style="background:var(--bg-warm)">
+          </div>
+
+          <!-- Hours stepper -->
+          <div style="margin-bottom:18px">
+            <label class="p-input-label">Stunden</label>
+            <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:8px 0">
+              <div class="stepper-btn">&minus;</div>
+              <div class="stepper-val">2,50 Std.</div>
+              <div class="stepper-btn">+</div>
+            </div>
+            <p style="text-align:center;font-size:.65rem;color:var(--text-light)">In 0,25 Std. Schritten</p>
+          </div>
+
+          <!-- Description -->
+          <div style="margin-bottom:18px">
+            <label class="p-input-label">Beschreibung</label>
+            <textarea class="p-input" rows="2" style="background:var(--bg-warm);resize:none" placeholder="Was haben Sie gemacht?">Beete vorbereitet und Kompost verteilt</textarea>
+          </div>
+
+          <!-- Kreis -->
+          <div style="margin-bottom:20px">
+            <label class="p-input-label">Kreis</label>
+            <select class="p-input" style="background:var(--bg-warm)">
+              <option>Garten</option>
+              <option>IT</option>
+              <option>Veranstaltung</option>
+              <option>Bau</option>
+              <option>Finanzen</option>
+              <option>Kueche</option>
+            </select>
+          </div>
+
+          <button class="p-btn p-btn-primary" style="font-size:1rem;padding:16px">&#9201; Stunden erfassen</button>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item active" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── SCREEN 7: MEINE STUNDEN ──────── -->
+<div class="phone-wrap" id="screen-my-hours">
+  <div class="phone-label">7. Meine Stunden</div>
+  <div class="phone-label-sub">Stundenhistorie nach Monat</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content">
+      <div class="p-header">
+        <h1>Meine Stunden</h1>
+      </div>
+      <!-- Summary bar -->
+      <div style="padding:12px 20px;background:var(--primary-pale);display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:.78rem;font-weight:600;color:var(--primary)">Diesen Monat: 7,0 / 10,0 Std.</span>
+        <span class="p-badge p-badge-amber">70%</span>
+      </div>
+      <!-- Month tabs -->
+      <div style="display:flex;padding:12px 20px 0;gap:4px">
+        <div style="padding:6px 16px;border-radius:20px;background:var(--primary);color:var(--white);font-size:.75rem;font-weight:600">Nov</div>
+        <div style="padding:6px 16px;border-radius:20px;background:var(--bg-muted);color:var(--text-mid);font-size:.75rem;font-weight:600">Okt</div>
+        <div style="padding:6px 16px;border-radius:20px;background:var(--bg-muted);color:var(--text-mid);font-size:.75rem;font-weight:600">Sep</div>
+      </div>
+      <div class="p-body">
+        <!-- November entries -->
+        <p style="font-size:.68rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">November 2024</p>
+
+        <div class="p-card" style="display:flex;align-items:flex-start;gap:10px">
+          <div style="background:var(--primary);color:var(--white);border-radius:8px;padding:4px 8px;font-weight:700;font-size:.8rem;flex-shrink:0">2,0</div>
+          <div style="flex:1">
+            <div style="font-size:.8rem;font-weight:600;color:var(--text)">Beete vorbereitet</div>
+            <div style="font-size:.68rem;color:var(--text-light);margin-top:2px">06. Nov &middot; <span class="p-badge p-badge-green" style="font-size:.58rem">Garten</span></div>
+          </div>
+        </div>
+
+        <div class="p-card" style="display:flex;align-items:flex-start;gap:10px">
+          <div style="background:var(--primary);color:var(--white);border-radius:8px;padding:4px 8px;font-weight:700;font-size:.8rem;flex-shrink:0">3,0</div>
+          <div style="flex:1">
+            <div style="font-size:.8rem;font-weight:600;color:var(--text)">Website-Updates eingepflegt</div>
+            <div style="font-size:.68rem;color:var(--text-light);margin-top:2px">04. Nov &middot; <span class="p-badge p-badge-muted" style="font-size:.58rem">IT</span></div>
+          </div>
+        </div>
+
+        <div class="p-card" style="display:flex;align-items:flex-start;gap:10px">
+          <div style="background:var(--primary);color:var(--white);border-radius:8px;padding:4px 8px;font-weight:700;font-size:.8rem;flex-shrink:0">2,0</div>
+          <div style="flex:1">
+            <div style="font-size:.8rem;font-weight:600;color:var(--text)">Herbstfest Organisation</div>
+            <div style="font-size:.68rem;color:var(--text-light);margin-top:2px">01. Nov &middot; <span class="p-badge p-badge-coral" style="font-size:.58rem">Veranstaltung</span></div>
+          </div>
+        </div>
+
+        <p style="font-size:.68rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 8px">Oktober 2024</p>
+
+        <div class="p-card" style="display:flex;align-items:flex-start;gap:10px">
+          <div style="background:var(--bg-dark);color:var(--white);border-radius:8px;padding:4px 8px;font-weight:700;font-size:.8rem;flex-shrink:0">4,5</div>
+          <div style="flex:1">
+            <div style="font-size:.8rem;font-weight:600;color:var(--text)">Zaun repariert</div>
+            <div style="font-size:.68rem;color:var(--text-light);margin-top:2px">28. Okt &middot; <span class="p-badge p-badge-muted" style="font-size:.58rem">Bau</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item active" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── SCREEN 8: MARKTPLATZ ──────── -->
+<div class="phone-wrap" id="screen-marketplace">
+  <div class="phone-label">8. Marktplatz</div>
+  <div class="phone-label-sub">Aufgaben durchsuchen</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content">
+      <div class="p-header" style="display:flex;align-items:center;justify-content:space-between">
+        <h1>Marktplatz</h1>
+        <button class="p-btn p-btn-primary p-btn-sm" style="border-radius:50%;width:32px;height:32px;padding:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem">+</button>
+      </div>
+      <div class="p-body">
+        <div class="filter-bar">
+          <div class="filter-chip active">Alle Kreise</div>
+          <div class="filter-chip">Garten</div>
+          <div class="filter-chip">IT</div>
+          <div class="filter-chip">Veranstaltung</div>
+          <div class="filter-chip">Dringend</div>
+        </div>
+
+        <!-- Job card 1 -->
+        <div class="p-card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+            <div style="font-family:var(--font-heading);font-weight:700;font-size:.88rem;color:var(--text);flex:1">Winterfest Dekoration aufbauen</div>
+            <span class="p-badge p-badge-coral">Dringend</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+            <span class="p-badge p-badge-amber">~3,0 Std.</span>
+            <span class="p-badge p-badge-green">Veranstaltung</span>
+            <span style="font-size:.65rem;color:var(--text-light)">2/4 Plaetze</span>
+          </div>
+          <button class="p-btn p-btn-primary p-btn-sm" style="width:100%;margin-top:6px">Ich mache das!</button>
+        </div>
+
+        <!-- Job card 2 -->
+        <div class="p-card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+            <div style="font-family:var(--font-heading);font-weight:700;font-size:.88rem;color:var(--text);flex:1">Server-Backup einrichten</div>
+            <span class="p-badge p-badge-amber">Mittel</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+            <span class="p-badge p-badge-amber">~2,0 Std.</span>
+            <span class="p-badge p-badge-muted">IT</span>
+            <span style="font-size:.65rem;color:var(--text-light)">0/1 Plaetze</span>
+          </div>
+          <button class="p-btn p-btn-primary p-btn-sm" style="width:100%;margin-top:6px">Ich mache das!</button>
+        </div>
+
+        <!-- Job card 3 -->
+        <div class="p-card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+            <div style="font-family:var(--font-heading);font-weight:700;font-size:.88rem;color:var(--text);flex:1">Hochbeete winterfest machen</div>
+            <span class="p-badge p-badge-muted">Normal</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+            <span class="p-badge p-badge-amber">~1,5 Std.</span>
+            <span class="p-badge p-badge-green">Garten</span>
+            <span style="font-size:.65rem;color:var(--text-light)">1/3 Plaetze</span>
+          </div>
+          <button class="p-btn p-btn-primary p-btn-sm" style="width:100%;margin-top:6px">Ich mache das!</button>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item active" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── SCREEN 9: AUFGABE DETAIL ──────── -->
+<div class="phone-wrap" id="screen-job-detail">
+  <div class="phone-label">9. Aufgabe Detail</div>
+  <div class="phone-label-sub">Vollstaendige Aufgabenansicht</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content">
+      <div class="p-header" style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:1.1rem;cursor:pointer">&larr;</span>
+        <h1 style="font-size:1.05rem">Aufgabe</h1>
+      </div>
+      <div class="p-body">
+        <h2 style="font-family:var(--font-heading);font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:8px">Winterfest Dekoration aufbauen</h2>
+
+        <!-- Poster -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <div class="p-avatar" style="background:var(--accent);width:32px;height:32px;font-size:.7rem">TK</div>
+          <div>
+            <div style="font-size:.78rem;font-weight:600;color:var(--text)">Thomas Klein</div>
+            <div style="font-size:.65rem;color:var(--text-light)">Erstellt am 02.11.2024</div>
+          </div>
+        </div>
+
+        <p style="font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:14px">
+          Wir brauchen Hilfe beim Aufbau der Winterfest-Dekoration in der Aula und im Eingangsbereich. Lichterketten, Girlanden und Tischdeko muessen angebracht werden.
+        </p>
+
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--text-mid)">
+            <span>&#9201;</span> <strong>~3,0 Std.</strong>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--text-mid)">
+            <span>&#11044;</span> <strong>Veranstaltung</strong>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--accent)">
+            <span>&#9888;</span> <strong>Dringend</strong>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--text-mid)">
+            <span>&#128197;</span> <strong>Bis 15.11.2024</strong>
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px">
+          <div style="font-size:.72rem;font-weight:600;color:var(--text-mid);margin-bottom:6px">Benoetigte Faehigkeiten</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Handwerk</span>
+            <span class="skill-tag">Organisation</span>
+          </div>
+        </div>
+
+        <button class="p-btn p-btn-primary" style="font-size:1rem;padding:16px;margin-bottom:16px">Ich mache das!</button>
+
+        <div style="font-size:.72rem;font-weight:600;color:var(--text-mid);margin-bottom:8px">Bereits dabei (2/4)</div>
+        <div class="claimant-row">
+          <div class="p-avatar" style="background:var(--secondary)">LH</div>
+          <div style="font-size:.78rem;font-weight:500;color:var(--text)">Lisa Hoffmann</div>
+          <span class="p-badge p-badge-green" style="margin-left:auto;font-size:.58rem">Bestaetigt</span>
+        </div>
+        <div class="claimant-row">
+          <div class="p-avatar" style="background:var(--primary)">MW</div>
+          <div style="font-size:.78rem;font-weight:500;color:var(--text)">Martin Weber</div>
+          <span class="p-badge p-badge-amber" style="margin-left:auto;font-size:.58rem">Bestaetigt</span>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item active" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── SCREEN 10: ANGEBOT ERSTELLEN ──────── -->
+<div class="phone-wrap" id="screen-post-job">
+  <div class="phone-label">10. Angebot erstellen</div>
+  <div class="phone-label-sub">Neue Aufgabe veroeffentlichen</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content">
+      <div class="p-header" style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:1.1rem;cursor:pointer">&larr;</span>
+        <h1 style="font-size:1.05rem">Aufgabe erstellen</h1>
+      </div>
+      <div class="p-body">
+        <div style="margin-bottom:14px">
+          <label class="p-input-label">Titel</label>
+          <input class="p-input" placeholder="z.B. Gartenhaus streichen" style="background:var(--white)">
+        </div>
+        <div style="margin-bottom:14px">
+          <label class="p-input-label">Beschreibung</label>
+          <textarea class="p-input" rows="3" style="background:var(--white);resize:none" placeholder="Was muss gemacht werden?"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <div style="flex:1">
+            <label class="p-input-label">Gesch. Stunden</label>
+            <input class="p-input" type="text" value="2,0" style="background:var(--white)">
+          </div>
+          <div style="flex:1">
+            <label class="p-input-label">Max. Helfer</label>
+            <input class="p-input" type="text" value="3" style="background:var(--white)">
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <label class="p-input-label">Kreis</label>
+          <select class="p-input" style="background:var(--white)">
+            <option>Kreis waehlen...</option>
+            <option>Garten</option>
+            <option>IT</option>
+            <option>Veranstaltung</option>
+            <option>Bau</option>
+          </select>
+        </div>
+        <div style="margin-bottom:14px">
+          <label class="p-input-label">Dringlichkeit</label>
+          <div style="display:flex;gap:6px">
+            <div style="flex:1;padding:8px;border-radius:var(--radius-sm);border:2px solid var(--bg-muted);text-align:center;font-size:.7rem;font-weight:600;color:var(--text-mid)">Niedrig</div>
+            <div style="flex:1;padding:8px;border-radius:var(--radius-sm);border:2px solid var(--bg-muted);text-align:center;font-size:.7rem;font-weight:600;color:var(--text-mid)">Normal</div>
+            <div style="flex:1;padding:8px;border-radius:var(--radius-sm);border:2px solid var(--primary);background:var(--primary-pale);text-align:center;font-size:.7rem;font-weight:600;color:var(--primary)">Hoch</div>
+            <div style="flex:1;padding:8px;border-radius:var(--radius-sm);border:2px solid var(--bg-muted);text-align:center;font-size:.7rem;font-weight:600;color:var(--text-mid)">Dringend</div>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <label class="p-input-label">Faellig bis</label>
+          <input class="p-input" type="text" value="20.11.2024" style="background:var(--white)">
+        </div>
+        <div style="margin-bottom:18px">
+          <label class="p-input-label">Benoetigte Faehigkeiten</label>
+          <div class="skill-tags">
+            <span class="skill-tag selected">Handwerk</span>
+            <span class="skill-tag">Garten</span>
+            <span class="skill-tag">IT</span>
+            <span class="skill-tag selected">Organisation</span>
+          </div>
+        </div>
+        <button class="p-btn p-btn-secondary" style="font-size:.95rem;padding:16px">Aufgabe posten</button>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item active" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ──────── SCREEN 11: KREISE UEBERSICHT ──────── -->
+<div class="phone-wrap" id="screen-kreise">
+  <div class="phone-label">11. Kreise Uebersicht</div>
+  <div class="phone-label-sub">Alle Arbeitskreise</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content">
+      <div class="p-header">
+        <h1>Kreise</h1>
+        <div class="p-header-sub">Arbeitskreise der Schule</div>
+      </div>
+      <div class="p-body">
+        <div class="kreis-grid">
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:var(--secondary-pale)">&#127793;</div>
+            <div class="kreis-name">Garten</div>
+            <div class="kreis-meta">12 Mitglieder &middot; 3 Aufgaben</div>
+            <div style="margin-top:8px"><span class="p-badge p-badge-green">Mitglied</span></div>
+          </div>
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:#E8EAF6">&#128187;</div>
+            <div class="kreis-name">IT</div>
+            <div class="kreis-meta">5 Mitglieder &middot; 2 Aufgaben</div>
+            <div style="margin-top:8px"><span class="p-badge p-badge-green">Mitglied</span></div>
+          </div>
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:var(--accent-pale)">&#127878;</div>
+            <div class="kreis-name">Veranstaltung</div>
+            <div class="kreis-meta">18 Mitglieder &middot; 5 Aufgaben</div>
+            <div style="margin-top:8px"><button class="p-btn p-btn-outline p-btn-sm" style="font-size:.62rem;padding:4px 10px">Beitreten</button></div>
+          </div>
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:#FFF3E0">&#128296;</div>
+            <div class="kreis-name">Bau</div>
+            <div class="kreis-meta">8 Mitglieder &middot; 1 Aufgabe</div>
+            <div style="margin-top:8px"><button class="p-btn p-btn-outline p-btn-sm" style="font-size:.62rem;padding:4px 10px">Beitreten</button></div>
+          </div>
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:#E8F5E9">&#128176;</div>
+            <div class="kreis-name">Finanzen</div>
+            <div class="kreis-meta">4 Mitglieder &middot; 0 Aufgaben</div>
+            <div style="margin-top:8px"><button class="p-btn p-btn-outline p-btn-sm" style="font-size:.62rem;padding:4px 10px">Beitreten</button></div>
+          </div>
+          <div class="kreis-card">
+            <div class="kreis-icon" style="background:#FFF8E1">&#127859;</div>
+            <div class="kreis-name">Kueche</div>
+            <div class="kreis-meta">9 Mitglieder &middot; 4 Aufgaben</div>
+            <div style="margin-top:8px"><button class="p-btn p-btn-outline p-btn-sm" style="font-size:.62rem;padding:4px 10px">Beitreten</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item active" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── SCREEN 12: KREIS DETAIL ──────── -->
+<div class="phone-wrap" id="screen-kreis-detail">
+  <div class="phone-label">12. Kreis Detail</div>
+  <div class="phone-label-sub">Einzelner Arbeitskreis</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content">
+      <!-- Header with bg -->
+      <div style="background:linear-gradient(135deg,var(--secondary),var(--secondary-light));padding:20px;color:var(--white)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:1.1rem;cursor:pointer">&larr;</span>
+          <span style="font-size:.78rem;opacity:.8">Zurueck</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:10px">
+          <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.6rem">&#127793;</div>
+          <div>
+            <h1 style="font-family:var(--font-heading);font-size:1.2rem;font-weight:800;color:var(--white)">Garten</h1>
+            <p style="font-size:.72rem;opacity:.85">Pflege des Schulgartens und der Aussenanlagen</p>
+          </div>
+        </div>
+      </div>
+      <div class="p-body">
+        <!-- Members -->
+        <div style="margin-bottom:16px">
+          <div style="font-family:var(--font-heading);font-weight:700;font-size:.82rem;color:var(--text);margin-bottom:8px">Mitglieder (12)</div>
+          <div style="display:flex;gap:-4px;align-items:center">
+            <div class="p-avatar" style="background:var(--primary);width:32px;height:32px;font-size:.65rem;margin-right:-6px;border:2px solid var(--white);position:relative;z-index:5">SM</div>
+            <div class="p-avatar" style="background:var(--secondary);width:32px;height:32px;font-size:.65rem;margin-right:-6px;border:2px solid var(--white);position:relative;z-index:4">TK</div>
+            <div class="p-avatar" style="background:var(--accent);width:32px;height:32px;font-size:.65rem;margin-right:-6px;border:2px solid var(--white);position:relative;z-index:3">LH</div>
+            <div class="p-avatar" style="background:#7986CB;width:32px;height:32px;font-size:.65rem;margin-right:-6px;border:2px solid var(--white);position:relative;z-index:2">MW</div>
+            <div class="p-avatar" style="background:var(--bg-dark);width:32px;height:32px;font-size:.55rem;border:2px solid var(--white);position:relative;z-index:1;color:var(--text)">+8</div>
+          </div>
+        </div>
+
+        <!-- Active tasks -->
+        <div style="font-family:var(--font-heading);font-weight:700;font-size:.82rem;color:var(--text);margin-bottom:8px">Aktuelle Aufgaben (3)</div>
+
+        <div class="p-card">
+          <div style="font-weight:600;font-size:.82rem;color:var(--text);margin-bottom:4px">Hochbeete winterfest machen</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="p-badge p-badge-amber">~1,5 Std.</span>
+            <span class="p-badge p-badge-muted">Normal</span>
+            <span style="font-size:.62rem;color:var(--text-light)">1/3 Plaetze</span>
+          </div>
+        </div>
+
+        <div class="p-card">
+          <div style="font-weight:600;font-size:.82rem;color:var(--text);margin-bottom:4px">Kompost umsetzen</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="p-badge p-badge-amber">~2,0 Std.</span>
+            <span class="p-badge p-badge-muted">Normal</span>
+            <span style="font-size:.62rem;color:var(--text-light)">0/2 Plaetze</span>
+          </div>
+        </div>
+
+        <div class="p-card">
+          <div style="font-weight:600;font-size:.82rem;color:var(--text);margin-bottom:4px">Geraeteschuppen aufraeumen</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="p-badge p-badge-amber">~1,0 Std.</span>
+            <span class="p-badge p-badge-coral">Dringend</span>
+            <span style="font-size:.62rem;color:var(--text-light)">2/2 Plaetze</span>
+          </div>
+        </div>
+
+        <button class="p-btn p-btn-outline" style="margin-top:8px;color:var(--accent);border-color:var(--accent);font-size:.8rem;padding:10px">Kreis verlassen</button>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item active" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── SCREEN 13: RANGLISTE ──────── -->
+<div class="phone-wrap" id="screen-leaderboard">
+  <div class="phone-label">13. Rangliste</div>
+  <div class="phone-label-sub">Familien-Ranking</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content">
+      <div class="p-header">
+        <h1>Rangliste</h1>
+        <div class="p-header-sub">November 2024</div>
+      </div>
+      <div class="p-body">
+        <!-- Top 3 podium -->
+        <div class="p-card" style="text-align:center;padding:20px;background:linear-gradient(180deg,#FFF9EE,var(--white))">
+          <div style="display:flex;justify-content:center;align-items:flex-end;gap:8px;margin-bottom:12px">
+            <!-- 2nd place -->
+            <div style="text-align:center">
+              <div class="p-avatar" style="background:var(--secondary);width:40px;height:40px;font-size:.75rem;margin:0 auto 4px">TK</div>
+              <div style="font-size:.68rem;font-weight:600;color:var(--text)">Klein</div>
+              <div style="font-size:.62rem;color:var(--text-light)">9,5 Std.</div>
+              <div style="width:50px;height:40px;background:#C0C0C0;border-radius:6px 6px 0 0;margin-top:4px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:var(--white)">2</div>
+            </div>
+            <!-- 1st place -->
+            <div style="text-align:center">
+              <div style="font-size:1rem;margin-bottom:2px">&#128081;</div>
+              <div class="p-avatar" style="background:var(--primary);width:48px;height:48px;font-size:.85rem;margin:0 auto 4px">BF</div>
+              <div style="font-size:.72rem;font-weight:700;color:var(--text)">Fischer</div>
+              <div style="font-size:.62rem;color:var(--text-light)">12,0 Std.</div>
+              <div style="width:55px;height:56px;background:#FFD700;border-radius:6px 6px 0 0;margin-top:4px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:#6B5900">1</div>
+            </div>
+            <!-- 3rd place -->
+            <div style="text-align:center">
+              <div class="p-avatar" style="background:var(--accent);width:40px;height:40px;font-size:.75rem;margin:0 auto 4px">AS</div>
+              <div style="font-size:.68rem;font-weight:600;color:var(--text)">Schmidt</div>
+              <div style="font-size:.62rem;color:var(--text-light)">8,5 Std.</div>
+              <div style="width:50px;height:28px;background:#CD7F32;border-radius:6px 6px 0 0;margin-top:4px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:var(--white)">3</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Remaining list -->
+        <div class="lb-row" style="background:var(--primary-pale);border-radius:var(--radius-sm);padding:10px;margin-top:4px">
+          <div class="lb-rank lb-normal">4</div>
+          <div class="p-avatar" style="background:var(--primary);width:30px;height:30px;font-size:.65rem">SM</div>
+          <div style="flex:1">
+            <div style="font-size:.78rem;font-weight:700;color:var(--primary)">Mueller (Du)</div>
+            <div class="lb-bar-wrap" style="margin-top:4px"><div class="lb-bar" style="width:70%;background:var(--primary)"></div></div>
+          </div>
+          <div style="font-size:.78rem;font-weight:700;color:var(--primary)">7,0</div>
+        </div>
+
+        <div class="lb-row">
+          <div class="lb-rank lb-normal">5</div>
+          <div class="p-avatar" style="background:#7986CB;width:30px;height:30px;font-size:.65rem">MW</div>
+          <div style="flex:1">
+            <div style="font-size:.78rem;font-weight:600;color:var(--text)">Weber</div>
+            <div class="lb-bar-wrap" style="margin-top:4px"><div class="lb-bar" style="width:65%;background:var(--secondary)"></div></div>
+          </div>
+          <div style="font-size:.78rem;font-weight:600;color:var(--text-mid)">6,5</div>
+        </div>
+
+        <div class="lb-row">
+          <div class="lb-rank lb-normal">6</div>
+          <div class="p-avatar" style="background:var(--bg-dark);width:30px;height:30px;font-size:.65rem;color:var(--text-mid)">?</div>
+          <div style="flex:1">
+            <div style="font-size:.78rem;font-weight:600;color:var(--text-light);font-style:italic">Anonym</div>
+            <div class="lb-bar-wrap" style="margin-top:4px"><div class="lb-bar" style="width:55%;background:var(--bg-dark)"></div></div>
+          </div>
+          <div style="font-size:.78rem;font-weight:600;color:var(--text-light)">5,5</div>
+        </div>
+
+        <div class="lb-row" style="border:none">
+          <div class="lb-rank lb-normal">7</div>
+          <div class="p-avatar" style="background:#A1887F;width:30px;height:30px;font-size:.65rem">RB</div>
+          <div style="flex:1">
+            <div style="font-size:.78rem;font-weight:600;color:var(--text)">Braun</div>
+            <div class="lb-bar-wrap" style="margin-top:4px"><div class="lb-bar" style="width:40%;background:var(--secondary)"></div></div>
+          </div>
+          <div style="font-size:.78rem;font-weight:600;color:var(--text-mid)">4,0</div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item active" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ──────── SCREEN 14: MEIN PROFIL ──────── -->
+<div class="phone-wrap" id="screen-profil">
+  <div class="phone-label">14. Mein Profil</div>
+  <div class="phone-label-sub">Avatar, Skills, Kreise, Datenschutz</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content" style="background:var(--bg-warm)">
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,var(--primary),var(--primary-light));padding:24px 20px 32px;text-align:center;border-radius:0 0 24px 24px">
+        <div style="font-family:var(--font-heading);font-size:1.1rem;font-weight:700;color:var(--white);margin-bottom:16px">Mein Profil</div>
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--white);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:var(--primary);font-family:var(--font-heading);border:3px solid rgba(255,255,255,.5)">SM</div>
+        <div style="font-family:var(--font-heading);font-size:1rem;font-weight:700;color:var(--white)">Stefan Mueller</div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.85);margin-top:2px">stefan@example.de</div>
+      </div>
+
+      <div style="padding:16px 16px 100px">
+        <!-- Bio -->
+        <div style="background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);margin-bottom:12px">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light);margin-bottom:6px;font-weight:600">Ueber mich</div>
+          <div style="font-size:.82rem;color:var(--text);line-height:1.5">Vater von Lina (3. Klasse). Handwerker mit Leidenschaft fuer Holzarbeit und Gartenarbeit.</div>
+        </div>
+
+        <!-- Skills -->
+        <div style="background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);margin-bottom:12px">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light);margin-bottom:8px;font-weight:600">Meine Skills</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="background:var(--primary-pale);color:var(--primary);padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600">Handwerk</span>
+            <span style="background:var(--secondary-pale);color:var(--secondary);padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600">Garten</span>
+            <span style="background:var(--accent-pale);color:var(--accent);padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600">Kochen</span>
+            <span style="background:var(--bg-muted);color:var(--text-mid);padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600">Elektrik</span>
+          </div>
+        </div>
+
+        <!-- Kreise -->
+        <div style="background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);margin-bottom:12px">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light);margin-bottom:8px;font-weight:600">Meine Kreise</div>
+          <div style="display:flex;gap:8px">
+            <div style="display:flex;align-items:center;gap:6px;background:var(--secondary-pale);padding:6px 12px;border-radius:var(--radius-sm)">
+              <span style="font-size:.9rem">&#127793;</span>
+              <span style="font-size:.75rem;font-weight:600;color:var(--secondary)">Garten</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:var(--primary-pale);padding:6px 12px;border-radius:var(--radius-sm)">
+              <span style="font-size:.9rem">&#128736;</span>
+              <span style="font-size:.75rem;font-weight:600;color:var(--primary)">Bau</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Familie -->
+        <div style="background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);margin-bottom:12px">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light);margin-bottom:6px;font-weight:600">Familie Mueller</div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:.78rem;color:var(--text-mid)">Einladungscode</div>
+            <div style="font-size:.82rem;font-weight:700;color:var(--primary);font-family:monospace;background:var(--primary-pale);padding:4px 10px;border-radius:6px">MUE-7X9K</div>
+          </div>
+        </div>
+
+        <!-- Privacy Toggle -->
+        <div style="background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:.82rem;font-weight:600;color:var(--text)">Datenschutz-Modus</div>
+              <div style="font-size:.72rem;color:var(--text-light);margin-top:2px">In der Rangliste anonym erscheinen</div>
+            </div>
+            <div style="width:44px;height:24px;background:var(--bg-muted);border-radius:12px;position:relative;cursor:pointer">
+              <div style="width:20px;height:20px;background:var(--white);border-radius:50%;position:absolute;top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Button -->
+        <button style="width:100%;padding:12px;background:var(--primary);color:var(--white);border:none;border-radius:var(--radius);font-family:var(--font-heading);font-weight:700;font-size:.88rem;cursor:pointer;margin-top:4px">Profil bearbeiten</button>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item active" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── SCREEN 15: ADMIN DASHBOARD ──────── -->
+<div class="phone-wrap" id="screen-admin">
+  <div class="phone-label">15. Admin Dashboard</div>
+  <div class="phone-label-sub">Statistiken, inaktive Familien</div>
+  <div class="phone">
+    <div class="status-bar">
+      <div class="status-left">9:41</div>
+      <div class="status-right"><span>&#9679;&#9679;&#9679;&#9679;</span> <span>WiFi</span> <span>&#128267;</span></div>
+    </div>
+    <div class="phone-content" style="background:var(--bg-warm)">
+      <!-- Header -->
+      <div style="padding:16px 20px 12px">
+        <div style="font-family:var(--font-heading);font-size:1.15rem;font-weight:800;color:var(--text)">Admin Dashboard</div>
+        <div style="font-size:.78rem;color:var(--text-light);margin-top:2px">Schuljahr 2025/26</div>
+      </div>
+
+      <div style="padding:0 16px 100px">
+        <!-- Stats Grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+          <div style="background:var(--primary-pale);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--primary);font-family:var(--font-heading)">48</div>
+            <div style="font-size:.68rem;color:var(--text-mid);font-weight:600">Familien</div>
+          </div>
+          <div style="background:var(--secondary-pale);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--secondary);font-family:var(--font-heading)">324</div>
+            <div style="font-size:.68rem;color:var(--text-mid);font-weight:600">Stunden gesamt</div>
+          </div>
+          <div style="background:var(--accent-pale);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--accent);font-family:var(--font-heading)">12</div>
+            <div style="font-size:.68rem;color:var(--text-mid);font-weight:600">Inaktive</div>
+          </div>
+          <div style="background:var(--bg-muted);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--text);font-family:var(--font-heading)">7</div>
+            <div style="font-size:.68rem;color:var(--text-mid);font-weight:600">Offene Aufgaben</div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <button style="flex:1;padding:10px;background:var(--primary);color:var(--white);border:none;border-radius:var(--radius-sm);font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--font-heading)">&#128229; CSV Export</button>
+          <button style="flex:1;padding:10px;background:var(--secondary);color:var(--white);border:none;border-radius:var(--radius-sm);font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--font-heading)">&#128231; Erinnerung</button>
+        </div>
+
+        <!-- Inactive Families -->
+        <div style="background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);margin-bottom:12px">
+          <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:10px;font-weight:700">&#9888; Inaktive Familien (0 Stunden)</div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bg-muted)">
+            <div>
+              <div style="font-size:.82rem;font-weight:600;color:var(--text)">Familie Wagner</div>
+              <div style="font-size:.68rem;color:var(--text-light)">Seit September inaktiv</div>
+            </div>
+            <span style="background:var(--accent-pale);color:var(--accent);padding:3px 8px;border-radius:20px;font-size:.65rem;font-weight:700">3 Monate</span>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bg-muted)">
+            <div>
+              <div style="font-size:.82rem;font-weight:600;color:var(--text)">Familie Klein</div>
+              <div style="font-size:.68rem;color:var(--text-light)">Seit Oktober inaktiv</div>
+            </div>
+            <span style="background:var(--primary-pale);color:var(--primary);padding:3px 8px;border-radius:20px;font-size:.65rem;font-weight:700">2 Monate</span>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+            <div>
+              <div style="font-size:.82rem;font-weight:600;color:var(--text)">Familie Bauer</div>
+              <div style="font-size:.68rem;color:var(--text-light)">Seit August inaktiv</div>
+            </div>
+            <span style="background:var(--accent);color:var(--white);padding:3px 8px;border-radius:20px;font-size:.65rem;font-weight:700">5 Monate</span>
+          </div>
+        </div>
+
+        <!-- Flagged Entries -->
+        <div style="background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);margin-bottom:12px">
+          <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:10px;font-weight:700">&#128681; Markierte Eintraege</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+            <div>
+              <div style="font-size:.82rem;font-weight:600;color:var(--text)">K. Fischer</div>
+              <div style="font-size:.68rem;color:var(--text-light)">8,0 Std. – "Gartenarbeit"</div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button style="background:var(--secondary-pale);color:var(--secondary);border:none;padding:4px 8px;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer">&#10003;</button>
+              <button style="background:var(--accent-pale);color:var(--accent);border:none;padding:4px 8px;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer">&#10005;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Outreach Log -->
+        <div style="background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)">
+          <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light);margin-bottom:10px;font-weight:700">&#128231; Letzte Erinnerungen</div>
+          <div style="padding:6px 0;border-bottom:1px solid var(--bg-muted);font-size:.75rem;display:flex;justify-content:space-between">
+            <span style="color:var(--text)">Fam. Wagner</span>
+            <span style="color:var(--text-light)">Sanfte Erinnerung · 1. Dez</span>
+          </div>
+          <div style="padding:6px 0;font-size:.75rem;display:flex;justify-content:space-between">
+            <span style="color:var(--text)">Fam. Klein</span>
+            <span style="color:var(--text-light)">Sanfte Erinnerung · 1. Dez</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <a class="nav-item active" href="#"><div class="nav-icon">&#127968;</div>Start</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128203;</div>Aufgaben</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#9201;</div>Stunden</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#11044;</div>Kreise</a>
+      <a class="nav-item" href="#"><div class="nav-icon">&#128100;</div>Profil</a>
+    </div>
+  </div>
+</div>
+
+</div><!-- /phones-grid -->
+</div><!-- /main -->
+</body>
+</html>

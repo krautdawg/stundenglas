@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foerderkreis - Design System &amp; Brand Guidelines</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       CSS CUSTOM PROPERTIES - Copy to codebase
+       ============================================ */
+    :root {
+      /* Primary - Amber/Honey */
+      --color-primary-50: #FFF8F0;
+      --color-primary-100: #FFEFD6;
+      --color-primary-200: #FFDBA8;
+      --color-primary-300: #FFC470;
+      --color-primary-400: #F5A623;
+      --color-primary-500: #E8891C;
+      --color-primary-600: #D07516;
+      --color-primary-700: #A85C10;
+      --color-primary-800: #7A420D;
+      --color-primary-900: #4D2A08;
+
+      /* Secondary - Sage Green */
+      --color-secondary-50: #F0F7F0;
+      --color-secondary-100: #DCEEDD;
+      --color-secondary-200: #B5DBB7;
+      --color-secondary-300: #84C287;
+      --color-secondary-400: #5EAD62;
+      --color-secondary-500: #4A8E50;
+      --color-secondary-600: #3B7340;
+      --color-secondary-700: #2D5A32;
+      --color-secondary-800: #204224;
+      --color-secondary-900: #142B17;
+
+      /* Accent - Warm Coral */
+      --color-accent-50: #FFF5F3;
+      --color-accent-100: #FFE6E0;
+      --color-accent-200: #FFC9BD;
+      --color-accent-300: #FFA490;
+      --color-accent-400: #F28068;
+      --color-accent-500: #E8644A;
+      --color-accent-600: #D04A32;
+      --color-accent-700: #A83826;
+      --color-accent-800: #7A2A1C;
+      --color-accent-900: #4D1B12;
+
+      /* Warm Neutrals (no cold grays) */
+      --color-neutral-50: #FDFCFB;
+      --color-neutral-100: #F7F5F3;
+      --color-neutral-200: #EDEAE6;
+      --color-neutral-300: #DDD8D2;
+      --color-neutral-400: #B8B0A6;
+      --color-neutral-500: #948B7F;
+      --color-neutral-600: #736A5E;
+      --color-neutral-700: #544D43;
+      --color-neutral-800: #3A352E;
+      --color-neutral-900: #231F1B;
+
+      /* Semantic Colors */
+      --color-success: #4A8E50;
+      --color-warning: #E8891C;
+      --color-error: #E8644A;
+      --color-info: #5B8FC9;
+
+      /* Background */
+      --color-bg-primary: #FDFCFB;
+      --color-bg-secondary: #F7F5F3;
+      --color-bg-tertiary: #EDEAE6;
+      --color-bg-card: #FFFFFF;
+
+      /* Typography */
+      --font-heading: 'Nunito', sans-serif;
+      --font-body: 'Inter', sans-serif;
+
+      --text-xs: 0.75rem;    /* 12px */
+      --text-sm: 0.875rem;   /* 14px */
+      --text-base: 1rem;     /* 16px */
+      --text-lg: 1.125rem;   /* 18px */
+      --text-xl: 1.25rem;    /* 20px */
+      --text-2xl: 1.5rem;    /* 24px */
+      --text-3xl: 1.875rem;  /* 30px */
+      --text-4xl: 2.25rem;   /* 36px */
+
+      --font-weight-normal: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      --font-weight-extrabold: 800;
+
+      --leading-tight: 1.25;
+      --leading-normal: 1.5;
+      --leading-relaxed: 1.625;
+
+      /* Spacing */
+      --space-0: 0;
+      --space-1: 0.25rem;   /* 4px */
+      --space-2: 0.5rem;    /* 8px */
+      --space-3: 0.75rem;   /* 12px */
+      --space-4: 1rem;      /* 16px */
+      --space-5: 1.25rem;   /* 20px */
+      --space-6: 1.5rem;    /* 24px */
+      --space-8: 2rem;      /* 32px */
+      --space-10: 2.5rem;   /* 40px */
+      --space-12: 3rem;     /* 48px */
+      --space-16: 4rem;     /* 64px */
+
+      /* Border Radius (friendly/rounded) */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+
+      /* Shadows (warm-tinted) */
+      --shadow-sm: 0 1px 2px rgba(35, 31, 27, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(35, 31, 27, 0.08), 0 2px 4px -2px rgba(35, 31, 27, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(35, 31, 27, 0.08), 0 4px 6px -4px rgba(35, 31, 27, 0.04);
+      --shadow-xl: 0 20px 25px -5px rgba(35, 31, 27, 0.1), 0 8px 10px -6px rgba(35, 31, 27, 0.05);
+
+      /* Transitions */
+      --transition-fast: 150ms ease;
+      --transition-normal: 250ms ease;
+      --transition-slow: 350ms ease;
+
+      /* Layout */
+      --nav-height: 64px;
+      --bottom-nav-height: 72px;
+      --max-width-content: 640px;
+    }
+
+    /* ============================================
+       DOCUMENT STYLES
+       ============================================ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-normal);
+      color: var(--color-neutral-900);
+      background: var(--color-bg-primary);
+    }
+
+    /* Navigation */
+    .doc-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: var(--color-neutral-900);
+      color: white;
+      padding: var(--space-6);
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .doc-nav h2 {
+      font-family: var(--font-heading);
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-6);
+      color: var(--color-primary-400);
+    }
+
+    .doc-nav a {
+      display: block;
+      color: var(--color-neutral-300);
+      text-decoration: none;
+      padding: var(--space-2) 0;
+      font-size: var(--text-sm);
+      transition: color var(--transition-fast);
+    }
+
+    .doc-nav a:hover { color: white; }
+
+    .doc-nav .nav-section {
+      margin-bottom: var(--space-4);
+    }
+
+    .doc-nav .nav-section-title {
+      font-size: var(--text-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-neutral-500);
+      margin-bottom: var(--space-2);
+    }
+
+    /* Main Content */
+    .doc-main {
+      margin-left: 280px;
+      padding: var(--space-12) var(--space-8);
+      max-width: 1100px;
+    }
+
+    @media (max-width: 900px) {
+      .doc-nav { display: none; }
+      .doc-main { margin-left: 0; padding: var(--space-6) var(--space-4); }
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: var(--space-16);
+      scroll-margin-top: var(--space-8);
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-3xl);
+      font-weight: var(--font-weight-extrabold);
+      color: var(--color-neutral-900);
+      margin-bottom: var(--space-2);
+    }
+
+    .section-subtitle {
+      font-size: var(--text-lg);
+      color: var(--color-neutral-500);
+      margin-bottom: var(--space-8);
+    }
+
+    h3 {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-neutral-800);
+      margin: var(--space-8) 0 var(--space-4);
+    }
+
+    h4 {
+      font-family: var(--font-heading);
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-700);
+      margin: var(--space-6) 0 var(--space-3);
+    }
+
+    p {
+      margin-bottom: var(--space-4);
+      color: var(--color-neutral-700);
+    }
+
+    /* Color Swatches */
+    .color-palette {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    .color-group h4 {
+      margin-bottom: var(--space-3);
+    }
+
+    .color-swatches {
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .color-swatch {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-sm);
+      font-family: monospace;
+      min-height: 48px;
+    }
+
+    .color-swatch .shade { font-weight: var(--font-weight-semibold); }
+
+    /* Typography Samples */
+    .type-sample {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-neutral-200);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      margin-bottom: var(--space-4);
+    }
+
+    .type-meta {
+      font-size: var(--text-xs);
+      color: var(--color-neutral-500);
+      font-family: monospace;
+      margin-top: var(--space-2);
+    }
+
+    /* Spacing Demo */
+    .spacing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .spacing-item {
+      text-align: center;
+    }
+
+    .spacing-box {
+      background: var(--color-primary-100);
+      border: 2px solid var(--color-primary-400);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-2);
+    }
+
+    .spacing-label {
+      font-size: var(--text-xs);
+      font-family: monospace;
+      color: var(--color-neutral-600);
+    }
+
+    /* Component Showcase */
+    .component-showcase {
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8);
+      margin-bottom: var(--space-8);
+    }
+
+    .component-showcase .component-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-2);
+      color: var(--color-neutral-900);
+    }
+
+    .component-showcase .component-desc {
+      font-size: var(--text-sm);
+      color: var(--color-neutral-500);
+      margin-bottom: var(--space-6);
+    }
+
+    .component-demo {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 120px;
+    }
+
+    .component-demo.left-align {
+      justify-content: flex-start;
+    }
+
+    .component-demo.full-width {
+      display: block;
+    }
+
+    /* Code Block */
+    .code-block {
+      background: var(--color-neutral-900);
+      color: #e2ddd7;
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      overflow-x: auto;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: var(--text-sm);
+      line-height: 1.6;
+      margin: var(--space-4) 0;
+    }
+
+    .code-block .comment { color: var(--color-neutral-500); }
+    .code-block .property { color: var(--color-primary-300); }
+    .code-block .value { color: var(--color-secondary-300); }
+
+    /* ============================================
+       COMPONENT STYLES (as they appear in the app)
+       ============================================ */
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: var(--color-bg-card);
+      border-top: 1px solid var(--color-neutral-200);
+      padding: var(--space-2) 0 var(--space-3);
+      width: 375px;
+      box-shadow: 0 -2px 10px rgba(35, 31, 27, 0.06);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: var(--space-1) var(--space-3);
+      color: var(--color-neutral-400);
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: var(--font-weight-medium);
+      transition: color var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--color-primary-500);
+    }
+
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Progress Ring */
+    .progress-ring-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+    }
+
+    .progress-ring-container svg {
+      transform: rotate(-90deg);
+    }
+
+    .progress-ring-bg {
+      fill: none;
+      stroke: var(--color-neutral-200);
+      stroke-width: 12;
+    }
+
+    .progress-ring-fill {
+      fill: none;
+      stroke: var(--color-primary-500);
+      stroke-width: 12;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.6s ease;
+    }
+
+    .progress-ring-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .progress-ring-hours {
+      font-family: var(--font-heading);
+      font-size: var(--text-3xl);
+      font-weight: var(--font-weight-extrabold);
+      color: var(--color-neutral-900);
+    }
+
+    .progress-ring-label {
+      font-size: var(--text-sm);
+      color: var(--color-neutral-500);
+    }
+
+    /* Job Card */
+    .job-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-md);
+      width: 100%;
+      max-width: 340px;
+      border: 1px solid var(--color-neutral-100);
+    }
+
+    .job-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-3);
+    }
+
+    .job-card-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-neutral-900);
+      line-height: var(--leading-tight);
+    }
+
+    .job-card-meta {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+      font-size: var(--text-sm);
+      color: var(--color-neutral-500);
+    }
+
+    .job-card-meta span {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .job-card-desc {
+      font-size: var(--text-sm);
+      color: var(--color-neutral-600);
+      margin-bottom: var(--space-4);
+      line-height: var(--leading-relaxed);
+    }
+
+    .job-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Hour Entry Card */
+    .hour-entry {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-neutral-100);
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .hour-entry-hours {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 56px;
+      padding: var(--space-2);
+      background: var(--color-primary-50);
+      border-radius: var(--radius-md);
+    }
+
+    .hour-entry-hours .number {
+      font-family: var(--font-heading);
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-extrabold);
+      color: var(--color-primary-600);
+    }
+
+    .hour-entry-hours .unit {
+      font-size: var(--text-xs);
+      color: var(--color-primary-500);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .hour-entry-content {
+      flex: 1;
+    }
+
+    .hour-entry-title {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-900);
+      margin-bottom: 2px;
+    }
+
+    .hour-entry-date {
+      font-size: var(--text-sm);
+      color: var(--color-neutral-400);
+    }
+
+    .hour-entry-kreis {
+      display: inline-block;
+      font-size: var(--text-xs);
+      background: var(--color-secondary-50);
+      color: var(--color-secondary-700);
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-full);
+      margin-top: var(--space-1);
+    }
+
+    /* Profile Card */
+    .profile-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-md);
+      text-align: center;
+      width: 340px;
+      border: 1px solid var(--color-neutral-100);
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--color-primary-200), var(--color-primary-400));
+      margin: 0 auto var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-heading);
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-bold);
+      color: white;
+    }
+
+    .profile-name {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-neutral-900);
+    }
+
+    .profile-family {
+      font-size: var(--text-sm);
+      color: var(--color-neutral-500);
+      margin-bottom: var(--space-4);
+    }
+
+    .profile-skills {
+      display: flex;
+      gap: var(--space-2);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Leaderboard Row */
+    .leaderboard-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      width: 100%;
+      max-width: 340px;
+      border: 1px solid var(--color-neutral-100);
+    }
+
+    .leaderboard-row.top-3 {
+      background: var(--color-primary-50);
+      border-color: var(--color-primary-200);
+    }
+
+    .leaderboard-rank {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-extrabold);
+      color: var(--color-neutral-400);
+      min-width: 32px;
+      text-align: center;
+    }
+
+    .leaderboard-row.top-3 .leaderboard-rank {
+      color: var(--color-primary-500);
+    }
+
+    .leaderboard-info {
+      flex: 1;
+    }
+
+    .leaderboard-name {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-900);
+    }
+
+    .leaderboard-bar-container {
+      height: 6px;
+      background: var(--color-neutral-200);
+      border-radius: var(--radius-full);
+      margin-top: var(--space-1);
+    }
+
+    .leaderboard-bar {
+      height: 100%;
+      background: var(--color-secondary-500);
+      border-radius: var(--radius-full);
+      transition: width 0.6s ease;
+    }
+
+    .leaderboard-row.top-3 .leaderboard-bar {
+      background: var(--color-primary-500);
+    }
+
+    .leaderboard-hours {
+      font-family: var(--font-heading);
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-neutral-700);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-5);
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-decoration: none;
+      line-height: 1;
+    }
+
+    .btn-primary {
+      background: var(--color-primary-500);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--color-primary-600); }
+
+    .btn-secondary {
+      background: var(--color-neutral-100);
+      color: var(--color-neutral-700);
+    }
+    .btn-secondary:hover { background: var(--color-neutral-200); }
+
+    .btn-success {
+      background: var(--color-secondary-500);
+      color: white;
+    }
+    .btn-success:hover { background: var(--color-secondary-600); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--color-primary-500);
+      border: 2px solid var(--color-primary-300);
+    }
+    .btn-outline:hover { background: var(--color-primary-50); }
+
+    .btn-lg {
+      padding: var(--space-4) var(--space-6);
+      font-size: var(--text-base);
+      border-radius: var(--radius-lg);
+    }
+
+    .btn-sm {
+      padding: var(--space-2) var(--space-3);
+      font-size: var(--text-xs);
+    }
+
+    .btn-icon {
+      padding: var(--space-3);
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: var(--space-5);
+    }
+
+    .form-label {
+      display: block;
+      font-size: var(--text-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-neutral-700);
+      margin-bottom: var(--space-2);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      border: 2px solid var(--color-neutral-200);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--color-neutral-900);
+      background: var(--color-bg-card);
+      transition: border-color var(--transition-fast);
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--color-primary-400);
+      box-shadow: 0 0 0 3px rgba(232, 137, 28, 0.15);
+    }
+
+    .form-input::placeholder {
+      color: var(--color-neutral-400);
+    }
+
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23948B7F' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 40px;
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* Badges & Tags */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 3px var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .badge-primary {
+      background: var(--color-primary-100);
+      color: var(--color-primary-700);
+    }
+
+    .badge-secondary {
+      background: var(--color-secondary-100);
+      color: var(--color-secondary-700);
+    }
+
+    .badge-accent {
+      background: var(--color-accent-100);
+      color: var(--color-accent-700);
+    }
+
+    .badge-neutral {
+      background: var(--color-neutral-100);
+      color: var(--color-neutral-600);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-1) var(--space-3);
+      background: var(--color-neutral-100);
+      color: var(--color-neutral-600);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .urgency-low { background: var(--color-secondary-100); color: var(--color-secondary-700); }
+    .urgency-normal { background: var(--color-primary-100); color: var(--color-primary-700); }
+    .urgency-high { background: var(--color-accent-100); color: var(--color-accent-700); }
+    .urgency-critical { background: var(--color-accent-500); color: white; }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-12) var(--space-6);
+      max-width: 300px;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: var(--space-4);
+    }
+
+    .empty-state-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-neutral-800);
+      margin-bottom: var(--space-2);
+    }
+
+    .empty-state-desc {
+      font-size: var(--text-sm);
+      color: var(--color-neutral-500);
+      margin-bottom: var(--space-6);
+    }
+
+    /* Toast / Notification */
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      max-width: 340px;
+      font-size: var(--text-sm);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .toast-success {
+      background: var(--color-secondary-50);
+      color: var(--color-secondary-800);
+      border-left: 4px solid var(--color-secondary-500);
+    }
+
+    .toast-error {
+      background: var(--color-accent-50);
+      color: var(--color-accent-800);
+      border-left: 4px solid var(--color-accent-500);
+    }
+
+    .toast-info {
+      background: var(--color-primary-50);
+      color: var(--color-primary-800);
+      border-left: 4px solid var(--color-primary-500);
+    }
+
+    .toast-icon {
+      flex-shrink: 0;
+      font-size: var(--text-lg);
+    }
+
+    /* Utility */
+    .flex-row { display: flex; gap: var(--space-3); align-items: center; }
+    .flex-wrap { flex-wrap: wrap; }
+    .flex-col { display: flex; flex-direction: column; gap: var(--space-3); }
+    .mt-4 { margin-top: var(--space-4); }
+    .mb-4 { margin-bottom: var(--space-4); }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <nav class="doc-nav">
+    <h2>Foerderkreis Design System</h2>
+    <div class="nav-section">
+      <div class="nav-section-title">Foundation</div>
+      <a href="#colors">Farbpalette</a>
+      <a href="#typography">Typografie</a>
+      <a href="#spacing">Abstande &amp; Radien</a>
+      <a href="#shadows">Schatten</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Components</div>
+      <a href="#bottom-nav">Bottom Navigation</a>
+      <a href="#progress-ring">Fortschrittsring</a>
+      <a href="#job-card">Aufgaben-Karte</a>
+      <a href="#hour-entry">Stunden-Eintrag</a>
+      <a href="#profile-card">Profil-Karte</a>
+      <a href="#leaderboard-row">Ranglisten-Zeile</a>
+      <a href="#buttons">Buttons</a>
+      <a href="#form-inputs">Formulareingaben</a>
+      <a href="#badges">Badges &amp; Tags</a>
+      <a href="#empty-state">Leerzustand</a>
+      <a href="#toast">Toast / Benachrichtigung</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Code</div>
+      <a href="#css-tokens">CSS Custom Properties</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="doc-main">
+
+    <div style="margin-bottom: var(--space-12);">
+      <h1 style="font-family: var(--font-heading); font-size: var(--text-4xl); font-weight: var(--font-weight-extrabold); color: var(--color-neutral-900); margin-bottom: var(--space-2);">
+        Foerderkreis Design System
+      </h1>
+      <p style="font-size: var(--text-lg); color: var(--color-neutral-500); max-width: 600px;">
+        Designrichtlinien fuer die Foerderkreis-App der Schule des Lebens.
+        Warm, einladend, gemeinschaftlich &mdash; keine kalten Grautoene.
+      </p>
+    </div>
+
+    <!-- ========== COLORS ========== -->
+    <section id="colors" class="section">
+      <h2 class="section-title">Farbpalette</h2>
+      <p class="section-subtitle">Warme, einladende Farben die Gemeinschaft und Engagement ausstrahlen.</p>
+
+      <div class="color-palette">
+        <!-- Primary -->
+        <div class="color-group">
+          <h4>Primary &mdash; Amber/Honey</h4>
+          <div class="color-swatches">
+            <div class="color-swatch" style="background: var(--color-primary-50); color: var(--color-primary-900);"><span class="shade">50</span><span>#FFF8F0</span></div>
+            <div class="color-swatch" style="background: var(--color-primary-100); color: var(--color-primary-900);"><span class="shade">100</span><span>#FFEFD6</span></div>
+            <div class="color-swatch" style="background: var(--color-primary-200); color: var(--color-primary-900);"><span class="shade">200</span><span>#FFDBA8</span></div>
+            <div class="color-swatch" style="background: var(--color-primary-300); color: var(--color-primary-900);"><span class="shade">300</span><span>#FFC470</span></div>
+            <div class="color-swatch" style="background: var(--color-primary-400); color: white;"><span class="shade">400</span><span>#F5A623</span></div>
+            <div class="color-swatch" style="background: var(--color-primary-500); color: white;"><span class="shade">500 (Brand)</span><span>#E8891C</span></div>
+            <div class="color-swatch" style="background: var(--color-primary-600); color: white;"><span class="shade">600</span><span>#D07516</span></div>
+            <div class="color-swatch" style="background: var(--color-primary-700); color: white;"><span class="shade">700</span><span>#A85C10</span></div>
+            <div class="color-swatch" style="background: var(--color-primary-800); color: white;"><span class="shade">800</span><span>#7A420D</span></div>
+            <div class="color-swatch" style="background: var(--color-primary-900); color: white;"><span class="shade">900</span><span>#4D2A08</span></div>
+          </div>
+        </div>
+
+        <!-- Secondary -->
+        <div class="color-group">
+          <h4>Secondary &mdash; Sage Green</h4>
+          <div class="color-swatches">
+            <div class="color-swatch" style="background: var(--color-secondary-50); color: var(--color-secondary-900);"><span class="shade">50</span><span>#F0F7F0</span></div>
+            <div class="color-swatch" style="background: var(--color-secondary-100); color: var(--color-secondary-900);"><span class="shade">100</span><span>#DCEEDD</span></div>
+            <div class="color-swatch" style="background: var(--color-secondary-200); color: var(--color-secondary-900);"><span class="shade">200</span><span>#B5DBB7</span></div>
+            <div class="color-swatch" style="background: var(--color-secondary-300); color: var(--color-secondary-900);"><span class="shade">300</span><span>#84C287</span></div>
+            <div class="color-swatch" style="background: var(--color-secondary-400); color: white;"><span class="shade">400</span><span>#5EAD62</span></div>
+            <div class="color-swatch" style="background: var(--color-secondary-500); color: white;"><span class="shade">500 (Brand)</span><span>#4A8E50</span></div>
+            <div class="color-swatch" style="background: var(--color-secondary-600); color: white;"><span class="shade">600</span><span>#3B7340</span></div>
+            <div class="color-swatch" style="background: var(--color-secondary-700); color: white;"><span class="shade">700</span><span>#2D5A32</span></div>
+            <div class="color-swatch" style="background: var(--color-secondary-800); color: white;"><span class="shade">800</span><span>#204224</span></div>
+            <div class="color-swatch" style="background: var(--color-secondary-900); color: white;"><span class="shade">900</span><span>#142B17</span></div>
+          </div>
+        </div>
+
+        <!-- Accent -->
+        <div class="color-group">
+          <h4>Accent &mdash; Warm Coral</h4>
+          <div class="color-swatches">
+            <div class="color-swatch" style="background: var(--color-accent-50); color: var(--color-accent-900);"><span class="shade">50</span><span>#FFF5F3</span></div>
+            <div class="color-swatch" style="background: var(--color-accent-100); color: var(--color-accent-900);"><span class="shade">100</span><span>#FFE6E0</span></div>
+            <div class="color-swatch" style="background: var(--color-accent-200); color: var(--color-accent-900);"><span class="shade">200</span><span>#FFC9BD</span></div>
+            <div class="color-swatch" style="background: var(--color-accent-300); color: var(--color-accent-900);"><span class="shade">300</span><span>#FFA490</span></div>
+            <div class="color-swatch" style="background: var(--color-accent-400); color: white;"><span class="shade">400</span><span>#F28068</span></div>
+            <div class="color-swatch" style="background: var(--color-accent-500); color: white;"><span class="shade">500 (Brand)</span><span>#E8644A</span></div>
+            <div class="color-swatch" style="background: var(--color-accent-600); color: white;"><span class="shade">600</span><span>#D04A32</span></div>
+            <div class="color-swatch" style="background: var(--color-accent-700); color: white;"><span class="shade">700</span><span>#A83826</span></div>
+            <div class="color-swatch" style="background: var(--color-accent-800); color: white;"><span class="shade">800</span><span>#7A2A1C</span></div>
+            <div class="color-swatch" style="background: var(--color-accent-900); color: white;"><span class="shade">900</span><span>#4D1B12</span></div>
+          </div>
+        </div>
+
+        <!-- Warm Neutrals -->
+        <div class="color-group">
+          <h4>Neutrals &mdash; Warm (keine kalten Grautoene)</h4>
+          <div class="color-swatches">
+            <div class="color-swatch" style="background: var(--color-neutral-50); color: var(--color-neutral-900); border: 1px solid #eee;"><span class="shade">50</span><span>#FDFCFB</span></div>
+            <div class="color-swatch" style="background: var(--color-neutral-100); color: var(--color-neutral-900);"><span class="shade">100</span><span>#F7F5F3</span></div>
+            <div class="color-swatch" style="background: var(--color-neutral-200); color: var(--color-neutral-900);"><span class="shade">200</span><span>#EDEAE6</span></div>
+            <div class="color-swatch" style="background: var(--color-neutral-300); color: var(--color-neutral-900);"><span class="shade">300</span><span>#DDD8D2</span></div>
+            <div class="color-swatch" style="background: var(--color-neutral-400); color: white;"><span class="shade">400</span><span>#B8B0A6</span></div>
+            <div class="color-swatch" style="background: var(--color-neutral-500); color: white;"><span class="shade">500</span><span>#948B7F</span></div>
+            <div class="color-swatch" style="background: var(--color-neutral-600); color: white;"><span class="shade">600</span><span>#736A5E</span></div>
+            <div class="color-swatch" style="background: var(--color-neutral-700); color: white;"><span class="shade">700</span><span>#544D43</span></div>
+            <div class="color-swatch" style="background: var(--color-neutral-800); color: white;"><span class="shade">800</span><span>#3A352E</span></div>
+            <div class="color-swatch" style="background: var(--color-neutral-900); color: white;"><span class="shade">900</span><span>#231F1B</span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Semantische Farben</h3>
+      <div style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-4);">
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+          <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--color-success);"></div>
+          <span style="font-size: var(--text-sm);">Erfolg / Success</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+          <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--color-warning);"></div>
+          <span style="font-size: var(--text-sm);">Warnung / Warning</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+          <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--color-error);"></div>
+          <span style="font-size: var(--text-sm);">Fehler / Error</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+          <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--color-info);"></div>
+          <span style="font-size: var(--text-sm);">Info</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== TYPOGRAPHY ========== -->
+    <section id="typography" class="section">
+      <h2 class="section-title">Typografie</h2>
+      <p class="section-subtitle">Nunito fuer Ueberschriften (freundlich, rund), Inter fuer Fliesstext (lesbar, klar).</p>
+
+      <div class="type-sample">
+        <div style="font-family: var(--font-heading); font-size: var(--text-4xl); font-weight: var(--font-weight-extrabold); line-height: var(--leading-tight);">
+          Gemeinsam stark
+        </div>
+        <div class="type-meta">Nunito ExtraBold, 36px / leading-tight</div>
+      </div>
+
+      <div class="type-sample">
+        <div style="font-family: var(--font-heading); font-size: var(--text-3xl); font-weight: var(--font-weight-bold); line-height: var(--leading-tight);">
+          Stunden erfassen
+        </div>
+        <div class="type-meta">Nunito Bold, 30px / leading-tight</div>
+      </div>
+
+      <div class="type-sample">
+        <div style="font-family: var(--font-heading); font-size: var(--text-2xl); font-weight: var(--font-weight-bold); line-height: var(--leading-tight);">
+          Marktplatz der Aufgaben
+        </div>
+        <div class="type-meta">Nunito Bold, 24px / leading-tight</div>
+      </div>
+
+      <div class="type-sample">
+        <div style="font-family: var(--font-heading); font-size: var(--text-xl); font-weight: var(--font-weight-semibold);">
+          Kreis-Uebersicht
+        </div>
+        <div class="type-meta">Nunito SemiBold, 20px / leading-normal</div>
+      </div>
+
+      <div class="type-sample">
+        <div style="font-family: var(--font-body); font-size: var(--text-base); line-height: var(--leading-relaxed);">
+          Die Schule des Lebens ist eine Elterninitiativschule. Alle Familien tragen zum Schulleben bei &mdash; durch freiwillige Stunden in verschiedenen Kreisen. Diese App hilft uns, den Ueberblick zu behalten und gemeinsam mehr zu erreichen.
+        </div>
+        <div class="type-meta">Inter Regular, 16px / leading-relaxed (Mindestgroesse fuer Fliesstext)</div>
+      </div>
+
+      <div class="type-sample">
+        <div style="font-family: var(--font-body); font-size: var(--text-sm); color: var(--color-neutral-600);">
+          Letzte Aktivitaet: vor 2 Stunden &mdash; 3,5 Std. im Garten-Kreis erfasst
+        </div>
+        <div class="type-meta">Inter Regular, 14px / secondary text</div>
+      </div>
+
+      <div class="type-sample">
+        <div style="font-family: var(--font-body); font-size: var(--text-xs); color: var(--color-neutral-500); text-transform: uppercase; letter-spacing: 0.05em; font-weight: var(--font-weight-semibold);">
+          Abschnitt-Label
+        </div>
+        <div class="type-meta">Inter SemiBold, 12px / uppercase, tracked</div>
+      </div>
+    </section>
+
+    <!-- ========== SPACING ========== -->
+    <section id="spacing" class="section">
+      <h2 class="section-title">Abstande &amp; Radien</h2>
+      <p class="section-subtitle">Konsistente Abstande auf Basis von 4px. Grosszuegige Radien fuer ein freundliches Erscheinungsbild.</p>
+
+      <h3>Spacing Scale</h3>
+      <div class="spacing-grid" style="margin-top: var(--space-4);">
+        <div class="spacing-item"><div class="spacing-box" style="height: 4px;"></div><div class="spacing-label">--space-1 (4px)</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="height: 8px;"></div><div class="spacing-label">--space-2 (8px)</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="height: 12px;"></div><div class="spacing-label">--space-3 (12px)</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="height: 16px;"></div><div class="spacing-label">--space-4 (16px)</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="height: 20px;"></div><div class="spacing-label">--space-5 (20px)</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="height: 24px;"></div><div class="spacing-label">--space-6 (24px)</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="height: 32px;"></div><div class="spacing-label">--space-8 (32px)</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="height: 40px;"></div><div class="spacing-label">--space-10 (40px)</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="height: 48px;"></div><div class="spacing-label">--space-12 (48px)</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="height: 64px;"></div><div class="spacing-label">--space-16 (64px)</div></div>
+      </div>
+
+      <h3>Border Radius</h3>
+      <div style="display: flex; gap: var(--space-6); flex-wrap: wrap; margin-top: var(--space-4);">
+        <div style="text-align: center;">
+          <div style="width: 80px; height: 80px; background: var(--color-primary-100); border: 2px solid var(--color-primary-400); border-radius: var(--radius-sm);"></div>
+          <div class="spacing-label" style="margin-top: var(--space-2);">--radius-sm (8px)</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 80px; height: 80px; background: var(--color-primary-100); border: 2px solid var(--color-primary-400); border-radius: var(--radius-md);"></div>
+          <div class="spacing-label" style="margin-top: var(--space-2);">--radius-md (12px)</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 80px; height: 80px; background: var(--color-primary-100); border: 2px solid var(--color-primary-400); border-radius: var(--radius-lg);"></div>
+          <div class="spacing-label" style="margin-top: var(--space-2);">--radius-lg (16px)</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 80px; height: 80px; background: var(--color-primary-100); border: 2px solid var(--color-primary-400); border-radius: var(--radius-xl);"></div>
+          <div class="spacing-label" style="margin-top: var(--space-2);">--radius-xl (24px)</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 80px; height: 80px; background: var(--color-primary-100); border: 2px solid var(--color-primary-400); border-radius: var(--radius-full);"></div>
+          <div class="spacing-label" style="margin-top: var(--space-2);">--radius-full</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SHADOWS ========== -->
+    <section id="shadows" class="section">
+      <h2 class="section-title">Schatten</h2>
+      <p class="section-subtitle">Warme Schatten mit braunem Unterton statt kaltem Grau.</p>
+
+      <div style="display: flex; gap: var(--space-8); flex-wrap: wrap; margin-top: var(--space-6);">
+        <div style="text-align: center;">
+          <div style="width: 120px; height: 80px; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);"></div>
+          <div class="spacing-label" style="margin-top: var(--space-3);">--shadow-sm</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 120px; height: 80px; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-md);"></div>
+          <div class="spacing-label" style="margin-top: var(--space-3);">--shadow-md</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 120px; height: 80px; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg);"></div>
+          <div class="spacing-label" style="margin-top: var(--space-3);">--shadow-lg</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 120px; height: 80px; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-xl);"></div>
+          <div class="spacing-label" style="margin-top: var(--space-3);">--shadow-xl</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== COMPONENTS ========== -->
+
+    <!-- 1. Bottom Navigation -->
+    <section id="bottom-nav" class="section">
+      <div class="component-showcase">
+        <div class="component-title">1. Bottom Navigation</div>
+        <div class="component-desc">Feste Navigation am unteren Bildschirmrand. 5 Tabs: Dashboard, Aufgaben, Stunden, Kreise, Profil.</div>
+        <div class="component-demo">
+          <div class="bottom-nav">
+            <a class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Start</span>
+            </a>
+            <a class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 3h-8l-2 4h12z"/></svg>
+              <span>Aufgaben</span>
+            </a>
+            <a class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>Stunden</span>
+            </a>
+            <a class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20 10 10 0 010-20"/><path d="M2 12h20"/></svg>
+              <span>Kreise</span>
+            </a>
+            <a class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>Profil</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Progress Ring -->
+    <section id="progress-ring" class="section">
+      <div class="component-showcase">
+        <div class="component-title">2. Fortschrittsring</div>
+        <div class="component-desc">Zeigt den aktuellen Stundenstand gegenueber dem Monatsziel. Animiert beim Laden.</div>
+        <div class="component-demo">
+          <div class="progress-ring-container">
+            <svg width="180" height="180" viewBox="0 0 180 180">
+              <circle class="progress-ring-bg" cx="90" cy="90" r="78"/>
+              <circle class="progress-ring-fill" cx="90" cy="90" r="78"
+                stroke-dasharray="490"
+                stroke-dashoffset="147"/>
+            </svg>
+            <div class="progress-ring-text">
+              <span class="progress-ring-hours">7,0</span>
+              <span class="progress-ring-label">von 10 Std.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Job Card -->
+    <section id="job-card" class="section">
+      <div class="component-showcase">
+        <div class="component-title">3. Aufgaben-Karte (Job Card)</div>
+        <div class="component-desc">Kompakte Darstellung einer Aufgabe im Marktplatz. Zeigt Titel, Kreis, geschaetzte Stunden, Dringlichkeit.</div>
+        <div class="component-demo">
+          <div class="job-card">
+            <div class="job-card-header">
+              <div class="job-card-title">Schulhof winterfest machen</div>
+              <span class="badge urgency-high">Dringend</span>
+            </div>
+            <div class="job-card-meta">
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                ~3 Std.
+              </span>
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                2/4 Plaetze
+              </span>
+            </div>
+            <div class="job-card-desc">
+              Laub harken, Beete abdecken, Gartengeraete einlagern. Bitte wetterfeste Kleidung mitbringen!
+            </div>
+            <div class="job-card-footer">
+              <span class="badge badge-secondary">Garten-Kreis</span>
+              <button class="btn btn-primary btn-sm">Ich mache das!</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Hour Entry Card -->
+    <section id="hour-entry" class="section">
+      <div class="component-showcase">
+        <div class="component-title">4. Stunden-Eintrag</div>
+        <div class="component-desc">Einzelner Eintrag in der Stundenhistorie. Zeigt Dauer, Beschreibung, Datum und Kreis.</div>
+        <div class="component-demo">
+          <div class="flex-col" style="width: 100%; max-width: 340px;">
+            <div class="hour-entry">
+              <div class="hour-entry-hours">
+                <span class="number">3,5</span>
+                <span class="unit">Std.</span>
+              </div>
+              <div class="hour-entry-content">
+                <div class="hour-entry-title">Schulhof winterfest gemacht</div>
+                <div class="hour-entry-date">12. November 2025</div>
+                <span class="hour-entry-kreis">Garten-Kreis</span>
+              </div>
+            </div>
+            <div class="hour-entry">
+              <div class="hour-entry-hours">
+                <span class="number">1,5</span>
+                <span class="unit">Std.</span>
+              </div>
+              <div class="hour-entry-content">
+                <div class="hour-entry-title">Elternabend vorbereitet</div>
+                <div class="hour-entry-date">8. November 2025</div>
+                <span class="hour-entry-kreis">Veranstaltungs-Kreis</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Profile Card -->
+    <section id="profile-card" class="section">
+      <div class="component-showcase">
+        <div class="component-title">5. Profil-Karte</div>
+        <div class="component-desc">Benutzerprofil mit Avatar, Name, Familie und Faehigkeiten.</div>
+        <div class="component-demo">
+          <div class="profile-card">
+            <div class="profile-avatar">SK</div>
+            <div class="profile-name">Sarah Koehler</div>
+            <div class="profile-family">Familie Koehler-Braun</div>
+            <div class="profile-skills">
+              <span class="tag">Garten</span>
+              <span class="tag">Organisation</span>
+              <span class="tag">Kochen</span>
+              <span class="tag">Erste Hilfe</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Leaderboard Row -->
+    <section id="leaderboard-row" class="section">
+      <div class="component-showcase">
+        <div class="component-title">6. Ranglisten-Zeile</div>
+        <div class="component-desc">Zeile in der Familien-Rangliste. Top 3 hervorgehoben. Familien im Datenschutzmodus werden als &bdquo;Anonym&ldquo; angezeigt.</div>
+        <div class="component-demo">
+          <div class="flex-col" style="width: 100%; max-width: 340px;">
+            <div class="leaderboard-row top-3">
+              <div class="leaderboard-rank">1</div>
+              <div class="leaderboard-info">
+                <div class="leaderboard-name">Familie Mueller</div>
+                <div class="leaderboard-bar-container">
+                  <div class="leaderboard-bar" style="width: 100%;"></div>
+                </div>
+              </div>
+              <div class="leaderboard-hours">24,5</div>
+            </div>
+            <div class="leaderboard-row top-3">
+              <div class="leaderboard-rank">2</div>
+              <div class="leaderboard-info">
+                <div class="leaderboard-name">Familie Koehler-Braun</div>
+                <div class="leaderboard-bar-container">
+                  <div class="leaderboard-bar" style="width: 82%;"></div>
+                </div>
+              </div>
+              <div class="leaderboard-hours">20,0</div>
+            </div>
+            <div class="leaderboard-row top-3">
+              <div class="leaderboard-rank">3</div>
+              <div class="leaderboard-info">
+                <div class="leaderboard-name">Familie Schmidt</div>
+                <div class="leaderboard-bar-container">
+                  <div class="leaderboard-bar" style="width: 65%;"></div>
+                </div>
+              </div>
+              <div class="leaderboard-hours">16,0</div>
+            </div>
+            <div class="leaderboard-row">
+              <div class="leaderboard-rank">4</div>
+              <div class="leaderboard-info">
+                <div class="leaderboard-name" style="color: var(--color-neutral-400); font-style: italic;">Anonyme Familie</div>
+                <div class="leaderboard-bar-container">
+                  <div class="leaderboard-bar" style="width: 49%;"></div>
+                </div>
+              </div>
+              <div class="leaderboard-hours">12,0</div>
+            </div>
+            <div class="leaderboard-row">
+              <div class="leaderboard-rank">5</div>
+              <div class="leaderboard-info">
+                <div class="leaderboard-name">Familie Weber</div>
+                <div class="leaderboard-bar-container">
+                  <div class="leaderboard-bar" style="width: 41%;"></div>
+                </div>
+              </div>
+              <div class="leaderboard-hours">10,0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Buttons -->
+    <section id="buttons" class="section">
+      <div class="component-showcase">
+        <div class="component-title">7. Buttons (4 Varianten)</div>
+        <div class="component-desc">Primaer, Sekundaer, Erfolg und Outline. Jeweils in 3 Groessen.</div>
+        <div class="component-demo full-width">
+          <h4 style="margin-top: 0;">Varianten</h4>
+          <div class="flex-row flex-wrap" style="margin-bottom: var(--space-6);">
+            <button class="btn btn-primary">Primaer</button>
+            <button class="btn btn-secondary">Sekundaer</button>
+            <button class="btn btn-success">Erfolg</button>
+            <button class="btn btn-outline">Outline</button>
+          </div>
+
+          <h4>Groessen</h4>
+          <div class="flex-row flex-wrap" style="margin-bottom: var(--space-6);">
+            <button class="btn btn-primary btn-lg">Gross (lg)</button>
+            <button class="btn btn-primary">Normal</button>
+            <button class="btn btn-primary btn-sm">Klein (sm)</button>
+          </div>
+
+          <h4>Mit Icon</h4>
+          <div class="flex-row flex-wrap">
+            <button class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Stunden erfassen
+            </button>
+            <button class="btn btn-success">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Ich mache das!
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Form Inputs -->
+    <section id="form-inputs" class="section">
+      <div class="component-showcase">
+        <div class="component-title">8. Formulareingaben</div>
+        <div class="component-desc">Text, Textarea, Select. Grosszuegige Touch-Targets, klare Labels, warme Fokus-Ringe.</div>
+        <div class="component-demo full-width" style="max-width: 400px;">
+          <div class="form-group">
+            <label class="form-label">Beschreibung</label>
+            <input type="text" class="form-input" placeholder="Was hast du gemacht?" value="Schulhof winterfest gemacht">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kreis</label>
+            <select class="form-input form-select">
+              <option>Garten-Kreis</option>
+              <option>Veranstaltungs-Kreis</option>
+              <option>IT-Kreis</option>
+              <option>Bau-Kreis</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Anmerkungen</label>
+            <textarea class="form-input form-textarea" placeholder="Optionale Details...">Zusammen mit Familie Schmidt die Beete winterfest gemacht.</textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. Badges & Tags -->
+    <section id="badges" class="section">
+      <div class="component-showcase">
+        <div class="component-title">9. Badges &amp; Tags</div>
+        <div class="component-desc">Kreis-Badges, Dringlichkeitsstufen, Skill-Tags und Status-Anzeigen.</div>
+        <div class="component-demo full-width">
+          <h4 style="margin-top: 0;">Kreis-Badges</h4>
+          <div class="flex-row flex-wrap" style="margin-bottom: var(--space-6);">
+            <span class="badge badge-primary">IT-Kreis</span>
+            <span class="badge badge-secondary">Garten-Kreis</span>
+            <span class="badge badge-accent">Veranstaltungs-Kreis</span>
+            <span class="badge badge-neutral">Bau-Kreis</span>
+          </div>
+
+          <h4>Dringlichkeit</h4>
+          <div class="flex-row flex-wrap" style="margin-bottom: var(--space-6);">
+            <span class="badge urgency-low">Niedrig</span>
+            <span class="badge urgency-normal">Normal</span>
+            <span class="badge urgency-high">Dringend</span>
+            <span class="badge urgency-critical">Kritisch</span>
+          </div>
+
+          <h4>Skill-Tags</h4>
+          <div class="flex-row flex-wrap">
+            <span class="tag">Garten</span>
+            <span class="tag">Organisation</span>
+            <span class="tag">Kochen</span>
+            <span class="tag">Handwerk</span>
+            <span class="tag">Erste Hilfe</span>
+            <span class="tag">IT</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. Empty State -->
+    <section id="empty-state" class="section">
+      <div class="component-showcase">
+        <div class="component-title">10. Leerzustand (Empty State)</div>
+        <div class="component-desc">Freundliche Darstellung wenn noch keine Daten vorhanden sind. Motivierend, nicht vorwurfsvoll.</div>
+        <div class="component-demo">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#127793;</div>
+            <div class="empty-state-title">Noch keine Stunden erfasst</div>
+            <div class="empty-state-desc">Jeder Beitrag zaehlt! Erfasse deine ersten freiwilligen Stunden und hilf unserer Schulgemeinschaft zu wachsen.</div>
+            <button class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Erste Stunden erfassen
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. Toast / Notification -->
+    <section id="toast" class="section">
+      <div class="component-showcase">
+        <div class="component-title">11. Toast / Benachrichtigung</div>
+        <div class="component-desc">Kurze Rueckmeldungen fuer Aktionen. 3 Varianten: Erfolg, Fehler, Info.</div>
+        <div class="component-demo">
+          <div class="flex-col" style="width: 100%;">
+            <div class="toast toast-success">
+              <span class="toast-icon">&#10003;</span>
+              <span>3,5 Stunden erfolgreich erfasst!</span>
+            </div>
+            <div class="toast toast-error">
+              <span class="toast-icon">&#10007;</span>
+              <span>Eintrag konnte nicht gespeichert werden. Bitte versuche es erneut.</span>
+            </div>
+            <div class="toast toast-info">
+              <span class="toast-icon">&#8505;</span>
+              <span>Neue Aufgabe im Garten-Kreis verfuegbar!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CSS TOKENS ========== -->
+    <section id="css-tokens" class="section">
+      <h2 class="section-title">CSS Custom Properties</h2>
+      <p class="section-subtitle">Kopiere diesen Block in die globale CSS-Datei des Projekts.</p>
+
+      <div class="code-block"><span class="comment">/* Foerderkreis Design Tokens - Copy to globals.css */</span>
+
+<span class="property">:root</span> {
+  <span class="comment">/* Primary - Amber/Honey */</span>
+  <span class="property">--color-primary-50</span>: <span class="value">#FFF8F0</span>;
+  <span class="property">--color-primary-100</span>: <span class="value">#FFEFD6</span>;
+  <span class="property">--color-primary-200</span>: <span class="value">#FFDBA8</span>;
+  <span class="property">--color-primary-300</span>: <span class="value">#FFC470</span>;
+  <span class="property">--color-primary-400</span>: <span class="value">#F5A623</span>;
+  <span class="property">--color-primary-500</span>: <span class="value">#E8891C</span>;
+  <span class="property">--color-primary-600</span>: <span class="value">#D07516</span>;
+  <span class="property">--color-primary-700</span>: <span class="value">#A85C10</span>;
+  <span class="property">--color-primary-800</span>: <span class="value">#7A420D</span>;
+  <span class="property">--color-primary-900</span>: <span class="value">#4D2A08</span>;
+
+  <span class="comment">/* Secondary - Sage Green */</span>
+  <span class="property">--color-secondary-50</span>: <span class="value">#F0F7F0</span>;
+  <span class="property">--color-secondary-100</span>: <span class="value">#DCEEDD</span>;
+  <span class="property">--color-secondary-200</span>: <span class="value">#B5DBB7</span>;
+  <span class="property">--color-secondary-300</span>: <span class="value">#84C287</span>;
+  <span class="property">--color-secondary-400</span>: <span class="value">#5EAD62</span>;
+  <span class="property">--color-secondary-500</span>: <span class="value">#4A8E50</span>;
+  <span class="property">--color-secondary-600</span>: <span class="value">#3B7340</span>;
+  <span class="property">--color-secondary-700</span>: <span class="value">#2D5A32</span>;
+  <span class="property">--color-secondary-800</span>: <span class="value">#204224</span>;
+  <span class="property">--color-secondary-900</span>: <span class="value">#142B17</span>;
+
+  <span class="comment">/* Accent - Warm Coral */</span>
+  <span class="property">--color-accent-50</span>: <span class="value">#FFF5F3</span>;
+  <span class="property">--color-accent-100</span>: <span class="value">#FFE6E0</span>;
+  <span class="property">--color-accent-200</span>: <span class="value">#FFC9BD</span>;
+  <span class="property">--color-accent-300</span>: <span class="value">#FFA490</span>;
+  <span class="property">--color-accent-400</span>: <span class="value">#F28068</span>;
+  <span class="property">--color-accent-500</span>: <span class="value">#E8644A</span>;
+  <span class="property">--color-accent-600</span>: <span class="value">#D04A32</span>;
+  <span class="property">--color-accent-700</span>: <span class="value">#A83826</span>;
+  <span class="property">--color-accent-800</span>: <span class="value">#7A2A1C</span>;
+  <span class="property">--color-accent-900</span>: <span class="value">#4D1B12</span>;
+
+  <span class="comment">/* Warm Neutrals */</span>
+  <span class="property">--color-neutral-50</span>: <span class="value">#FDFCFB</span>;
+  <span class="property">--color-neutral-100</span>: <span class="value">#F7F5F3</span>;
+  <span class="property">--color-neutral-200</span>: <span class="value">#EDEAE6</span>;
+  <span class="property">--color-neutral-300</span>: <span class="value">#DDD8D2</span>;
+  <span class="property">--color-neutral-400</span>: <span class="value">#B8B0A6</span>;
+  <span class="property">--color-neutral-500</span>: <span class="value">#948B7F</span>;
+  <span class="property">--color-neutral-600</span>: <span class="value">#736A5E</span>;
+  <span class="property">--color-neutral-700</span>: <span class="value">#544D43</span>;
+  <span class="property">--color-neutral-800</span>: <span class="value">#3A352E</span>;
+  <span class="property">--color-neutral-900</span>: <span class="value">#231F1B</span>;
+
+  <span class="comment">/* Semantic */</span>
+  <span class="property">--color-success</span>: <span class="value">#4A8E50</span>;
+  <span class="property">--color-warning</span>: <span class="value">#E8891C</span>;
+  <span class="property">--color-error</span>: <span class="value">#E8644A</span>;
+  <span class="property">--color-info</span>: <span class="value">#5B8FC9</span>;
+
+  <span class="comment">/* Background */</span>
+  <span class="property">--color-bg-primary</span>: <span class="value">#FDFCFB</span>;
+  <span class="property">--color-bg-secondary</span>: <span class="value">#F7F5F3</span>;
+  <span class="property">--color-bg-tertiary</span>: <span class="value">#EDEAE6</span>;
+  <span class="property">--color-bg-card</span>: <span class="value">#FFFFFF</span>;
+
+  <span class="comment">/* Typography */</span>
+  <span class="property">--font-heading</span>: <span class="value">'Nunito', sans-serif</span>;
+  <span class="property">--font-body</span>: <span class="value">'Inter', sans-serif</span>;
+
+  <span class="comment">/* Spacing, Radius, Shadows - see above */</span>
+}
+</div>
+    </section>
+
+  </main>
+
+</body>
+</html>
