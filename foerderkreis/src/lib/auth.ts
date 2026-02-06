@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptions = {
   providers: [
     EmailProvider({
       // Server not used - we use custom sendVerificationRequest with Brevo API
-      server: "smtp://not-used",
+      server: {},
       from: process.env.EMAIL_FROM || "noreply@sdl-app.de",
       sendVerificationRequest,
     }),
