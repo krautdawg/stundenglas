@@ -306,6 +306,37 @@ export default function OnboardingPage() {
                       {skill}
                     </Badge>
                   ))}
+                  {/* Custom skills that were added */}
+                  {skills
+                    .filter((s) => !COMMON_SKILLS.includes(s))
+                    .map((skill) => (
+                      <Badge
+                        key={skill}
+                        variant="default"
+                        className="cursor-pointer"
+                        onClick={() =>
+                          setSkills((prev) => prev.filter((s) => s !== skill))
+                        }
+                      >
+                        {skill} ×
+                      </Badge>
+                    ))}
+                  {/* Input for new custom skill */}
+                  <input
+                    type="text"
+                    placeholder="+ Neu"
+                    className="inline-flex items-center rounded-full border border-dashed border-muted-foreground/50 px-2.5 py-0.5 text-xs font-semibold bg-transparent focus:outline-none focus:border-primary w-20 placeholder:text-muted-foreground/50"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const value = e.currentTarget.value.trim();
+                        if (value && !skills.includes(value)) {
+                          setSkills((prev) => [...prev, value]);
+                          e.currentTarget.value = "";
+                        }
+                      }
+                    }}
+                  />
                 </div>
               </div>
             </div>
