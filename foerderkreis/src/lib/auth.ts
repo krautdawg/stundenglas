@@ -10,7 +10,13 @@ async function sendVerificationRequest({ identifier: email, url, provider }: {
   url: string;
   provider: { server: any; from: string };
 }) {
+  // Fix URL if NextAuth generated localhost instead of production URL
+  const baseUrl = process.env.NEXTAUTH_URL || "https://sdl.88.99.83.132.sslip.io";
+  const fixedUrl = url.replace(/^https?:\/\/localhost:\d+/, baseUrl);
+  
   console.log("[AUTH] sendVerificationRequest called for:", email);
+  console.log("[AUTH] Original URL:", url);
+  console.log("[AUTH] Fixed URL:", fixedUrl);
   console.log("[AUTH] SMTP server config:", JSON.stringify(provider.server, null, 2));
   
   try {
@@ -44,7 +50,7 @@ async function sendVerificationRequest({ identifier: email, url, provider }: {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding: 8px 0 32px 0;">
-                    <a href="${url}" style="display: inline-block; background: linear-gradient(135deg, #4A8E50 0%, #5EAD62 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(74, 142, 80, 0.3);">
+                    <a href="${fixedUrl}" style="display: inline-block; background: linear-gradient(135deg, #4A8E50 0%, #5EAD62 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(74, 142, 80, 0.3);">
                       Jetzt einloggen
                     </a>
                   </td>
@@ -70,7 +76,7 @@ async function sendVerificationRequest({ identifier: email, url, provider }: {
 </body>
 </html>`;
 
-  const text = `Schule des Lebens - Login\n\nHallo!\n\nKlicke auf den folgenden Link, um dich einzuloggen:\n${url}\n\nDer Link ist 24 Stunden gültig.\n\nFalls du diese E-Mail nicht angefordert hast, kannst du sie einfach ignorieren.`;
+  const text = `Schule des Lebens - Login\n\nHallo!\n\nKlicke auf den folgenden Link, um dich einzuloggen:\n${fixedUrl}\n\nDer Link ist 24 Stunden gültig.\n\nFalls du diese E-Mail nicht angefordert hast, kannst du sie einfach ignorieren.`;
 
     const result = await transport.sendMail({
       to: email,
