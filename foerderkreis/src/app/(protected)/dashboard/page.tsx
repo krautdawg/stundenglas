@@ -5,7 +5,7 @@ import { ProgressRing } from "@/components/custom/progress-ring";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Briefcase, TrendingUp, Calendar } from "lucide-react";
+import { Clock, Briefcase, TrendingUp, Calendar, FileText } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -171,6 +171,24 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Newsletter Link */}
+      <Card className="bg-gradient-to-r from-amber-50 to-sage-50">
+        <CardContent className="p-4">
+          <Link href="/newsletter" className="flex items-center gap-4">
+            <div className="rounded-lg bg-white p-2 shadow-sm">
+              <FileText className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <div className="font-heading font-bold">Newsletter-Archiv</div>
+              <div className="text-sm text-muted-foreground">
+                Alle Schul-Newsletter zum Download
+              </div>
+            </div>
+            <div className="text-muted-foreground">→</div>
+          </Link>
+        </CardContent>
+      </Card>
 
       {/* Recent Activity */}
       {recentHours.length > 0 && (
