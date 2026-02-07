@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ProfileForm } from "./profile-form";
 import { SignOutButton } from "./sign-out-button";
+import { AvatarUpload } from "./avatar-upload";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -12,7 +13,14 @@ export default async function ProfilePage() {
 
   const profile = await prisma.user.findUnique({
     where: { id: userId },
-    include: {
+    select: {
+      firstName: true,
+      lastName: true,
+      email: true,
+      bio: true,
+      skillTags: true,
+      privacyMode: true,
+      avatarUrl: true,
       family: { select: { name: true, inviteCode: true } },
     },
   });
@@ -31,9 +39,12 @@ export default async function ProfilePage() {
 
       {/* Avatar & Name */}
       <div className="text-center">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-200 to-amber-400 mx-auto flex items-center justify-center text-2xl font-heading font-bold text-white mb-3">
-          {profile?.firstName?.[0] || "?"}
-          {profile?.lastName?.[0] || ""}
+        <div className="flex justify-center mb-3">
+          <AvatarUpload
+            currentAvatarUrl={profile?.avatarUrl || null}
+            firstName={profile?.firstName || ""}
+            lastName={profile?.lastName || ""}
+          />
         </div>
         <h2 className="text-xl font-heading font-bold">
           {profile?.firstName} {profile?.lastName}

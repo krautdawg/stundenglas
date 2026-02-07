@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { profileSchema } from "@/lib/validations";
+import sharp from "sharp";
 
 export async function updateProfile(formData: FormData) {
   const session = await auth();
@@ -64,26 +65,30 @@ export async function uploadAvatar(formData: FormData) {
   const file = formData.get("avatar") as File;
   if (!file) return { error: "Keine Datei ausgewaehlt" };
 
-  if (file.size > 1024 * 1024) {
-    return { error: "Datei zu gross (max. 1 MB)" };
+  if (file.size > 5 * 1024 * 1024) {
+    return { error: "Datei zu gross (max. 5 MB)" };
   }
 
-  // For now, we'll use a base64 data URL (simple solution)
-  // In production, you'd use S3, Cloudflare R2, or similar
-  const buffer = await file.arrayBuffer();
-  const base64 = Buffer.from(buffer).toString("base64");
-  const mimeType = file.type || "image/png";
-  const dataUrl = `data:${mimeType};base64,${base64}`;
-
   try {
+    // Convert to webp, resize to max 256x256, and compress
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const webpBuffer = await sharp(buffer)
+      .resize(256, 256, { fit: "cover" })
+      .webp({ quality: 80 })
+      .toBuffer();
+
+    const base64 = webpBuffer.toString("base64");
+    const dataUrl = `data:image/webp;base64,${base64}`;
+
     await prisma.user.update({
       where: { id: session.user.id },
       data: { avatarUrl: dataUrl },
     });
-  } catch {
+
+    revalidatePath("/profile");
+    return { success: true, url: dataUrl };
+  } catch (error) {
+    console.error("Avatar upload error:", error);
     return { error: "Upload fehlgeschlagen" };
   }
-
-  revalidatePath("/profile");
-  return { success: true, url: dataUrl };
 }
