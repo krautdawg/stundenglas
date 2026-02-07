@@ -17,6 +17,6 @@ export async function signIn(formData: FormData) {
 }
 
 export async function signOut() {
-  // For server-side sign out, redirect to the NextAuth sign out endpoint
-  redirect("/api/auth/signout");
+  // Redirect to custom German signout page
+  redirect("/signout");
 }

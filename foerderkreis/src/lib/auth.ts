@@ -113,6 +113,7 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "database" },
   pages: {
     signIn: "/login",
+    signOut: "/signout",
     verifyRequest: "/login/verify",
     error: "/login/error",
   },
