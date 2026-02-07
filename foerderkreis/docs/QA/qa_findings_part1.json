@@ -1,0 +1,50 @@
+{
+  "findings": [
+    {
+      "time": "2026-02-07T11:02:39.475726",
+      "msg": "Navigating to app..."
+    },
+    {
+      "time": "2026-02-07T11:02:40.527789",
+      "msg": "Screenshot: 01_landing_page"
+    },
+    {
+      "time": "2026-02-07T11:02:40.529378",
+      "msg": "Page title: Schule des Lebens"
+    },
+    {
+      "time": "2026-02-07T11:02:40.529384",
+      "msg": "Looking for login link..."
+    },
+    {
+      "time": "2026-02-07T11:02:41.226594",
+      "msg": "Screenshot: 02_login_page"
+    },
+    {
+      "time": "2026-02-07T11:02:41.230719",
+      "msg": "Found email input on login page"
+    },
+    {
+      "time": "2026-02-07T11:02:41.230727",
+      "msg": "Entering email: tim.neunzig@posteo.de"
+    },
+    {
+      "time": "2026-02-07T11:02:41.307593",
+      "msg": "Screenshot: 03_email_entered"
+    },
+    {
+      "time": "2026-02-07T11:02:41.425584",
+      "msg": "Screenshot: 04_after_submit"
+    },
+    {
+      "time": "2026-02-07T11:02:41.425594",
+      "msg": "Email submitted for magic link"
+    }
+  ],
+  "screenshots": [
+    "01_landing_page",
+    "02_login_page",
+    "03_email_entered",
+    "04_after_submit"
+  ]
+}

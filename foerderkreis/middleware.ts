@@ -1,10 +1,21 @@
-import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// For database session strategy, we check for the session cookie
+// The actual session validation happens server-side
+function hasSessionCookie(req: NextRequest): boolean {
+  // Check for both secure and non-secure cookie names
+  const sessionCookie = 
+    req.cookies.get("__Secure-next-auth.session-token") ||
+    req.cookies.get("next-auth.session-token") ||
+    req.cookies.get("authjs.session-token") ||
+    req.cookies.get("__Secure-authjs.session-token");
+  
+  return !!sessionCookie?.value;
+}
+
 export async function middleware(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  const isLoggedIn = !!token;
+  const hasSession = hasSessionCookie(req);
   const isAuthPage = req.nextUrl.pathname.startsWith("/login");
   const isProtectedRoute =
     req.nextUrl.pathname.startsWith("/(protected)") ||
@@ -23,11 +34,13 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname === "/admin" ||
     req.nextUrl.pathname.startsWith("/admin");
 
-  if (isAuthPage && isLoggedIn) {
+  // Redirect logged-in users away from auth pages
+  if (isAuthPage && hasSession) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  if (isProtectedRoute && !isLoggedIn) {
+  // Redirect unauthenticated users to login
+  if (isProtectedRoute && !hasSession) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 

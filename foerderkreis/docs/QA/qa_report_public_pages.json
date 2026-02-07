@@ -1,0 +1,189 @@
+{
+  "timestamp": "2026-02-07T11:07:32.141904",
+  "base_url": "https://sdl.88.99.83.132.sslip.io",
+  "bugs": [
+    "  BUG: /login/error returns 404!"
+  ],
+  "findings": [
+    {
+      "time": "2026-02-07T11:07:26.889668",
+      "msg": "Testing: Landing Page (/)",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:27.829124",
+      "msg": "  Status: 200, URL: https://sdl.88.99.83.132.sslip.io/login, Title: Schule des Lebens",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:27.899885",
+      "msg": "Screenshot: 10_landing_page",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:27.899894",
+      "msg": "Testing: Login Page (/login)",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:28.524206",
+      "msg": "  Status: 200, URL: https://sdl.88.99.83.132.sslip.io/login, Title: Schule des Lebens",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:28.583097",
+      "msg": "Screenshot: 10_login_page",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:28.583106",
+      "msg": "Testing: Login Verify Page (/login/verify)",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:29.283793",
+      "msg": "  Status: 200, URL: https://sdl.88.99.83.132.sslip.io/login/verify, Title: Schule des Lebens",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:29.349575",
+      "msg": "Screenshot: 10_login_verify_page",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:29.349584",
+      "msg": "Testing: Login Error Page (/login/error)",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:29.959293",
+      "msg": "  Status: 404, URL: https://sdl.88.99.83.132.sslip.io/login/error, Title: Schule des Lebens",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:29.959319",
+      "msg": "  BUG: /login/error returns 404!",
+      "is_bug": true
+    },
+    {
+      "time": "2026-02-07T11:07:30.012636",
+      "msg": "Screenshot: 10_login_error_page",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:30.012645",
+      "msg": "Testing: Impressum (/impressum)",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:30.714432",
+      "msg": "  Status: 200, URL: https://sdl.88.99.83.132.sslip.io/impressum, Title: Schule des Lebens",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:30.770277",
+      "msg": "Screenshot: 10_impressum",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:30.770287",
+      "msg": "Testing: Datenschutz (/datenschutz)",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:31.378187",
+      "msg": "  Status: 200, URL: https://sdl.88.99.83.132.sslip.io/datenschutz, Title: Schule des Lebens",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:31.485273",
+      "msg": "Screenshot: 10_datenschutz",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:31.485282",
+      "msg": "Checking links on login page...",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:32.112144",
+      "msg": "  Link: Impressum -> /impressum",
+      "is_bug": false
+    },
+    {
+      "time": "2026-02-07T11:07:32.116923",
+      "msg": "  Link: Datenschutz -> /datenschutz",
+      "is_bug": false
+    }
+  ],
+  "pages_tested": [
+    {
+      "path": "/",
+      "name": "Landing Page",
+      "status": 200,
+      "final_url": "https://sdl.88.99.83.132.sslip.io/login",
+      "title": "Schule des Lebens"
+    },
+    {
+      "path": "/login",
+      "name": "Login Page",
+      "status": 200,
+      "final_url": "https://sdl.88.99.83.132.sslip.io/login",
+      "title": "Schule des Lebens"
+    },
+    {
+      "path": "/login/verify",
+      "name": "Login Verify Page",
+      "status": 200,
+      "final_url": "https://sdl.88.99.83.132.sslip.io/login/verify",
+      "title": "Schule des Lebens"
+    },
+    {
+      "path": "/login/error",
+      "name": "Login Error Page",
+      "status": 404,
+      "final_url": "https://sdl.88.99.83.132.sslip.io/login/error",
+      "title": "Schule des Lebens"
+    },
+    {
+      "path": "/impressum",
+      "name": "Impressum",
+      "status": 200,
+      "final_url": "https://sdl.88.99.83.132.sslip.io/impressum",
+      "title": "Schule des Lebens"
+    },
+    {
+      "path": "/datenschutz",
+      "name": "Datenschutz",
+      "status": 200,
+      "final_url": "https://sdl.88.99.83.132.sslip.io/datenschutz",
+      "title": "Schule des Lebens"
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "10_landing_page",
+      "path": "/home/krautdawg/clawd/stundenglas/foerderkreis/docs/QA/10_landing_page.png"
+    },
+    {
+      "name": "10_login_page",
+      "path": "/home/krautdawg/clawd/stundenglas/foerderkreis/docs/QA/10_login_page.png"
+    },
+    {
+      "name": "10_login_verify_page",
+      "path": "/home/krautdawg/clawd/stundenglas/foerderkreis/docs/QA/10_login_verify_page.png"
+    },
+    {
+      "name": "10_login_error_page",
+      "path": "/home/krautdawg/clawd/stundenglas/foerderkreis/docs/QA/10_login_error_page.png"
+    },
+    {
+      "name": "10_impressum",
+      "path": "/home/krautdawg/clawd/stundenglas/foerderkreis/docs/QA/10_impressum.png"
+    },
+    {
+      "name": "10_datenschutz",
+      "path": "/home/krautdawg/clawd/stundenglas/foerderkreis/docs/QA/10_datenschutz.png"
+    }
+  ]
+}
