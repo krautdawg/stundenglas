@@ -10,7 +10,11 @@ async function sendVerificationRequest({ identifier: email, url, provider }: {
   url: string;
   provider: { server: any; from: string };
 }) {
-  const transport = createTransport(provider.server);
+  console.log("[AUTH] sendVerificationRequest called for:", email);
+  console.log("[AUTH] SMTP server config:", JSON.stringify(provider.server, null, 2));
+  
+  try {
+    const transport = createTransport(provider.server);
   
   const html = `
 <!DOCTYPE html>
@@ -68,13 +72,18 @@ async function sendVerificationRequest({ identifier: email, url, provider }: {
 
   const text = `Schule des Lebens - Login\n\nHallo!\n\nKlicke auf den folgenden Link, um dich einzuloggen:\n${url}\n\nDer Link ist 24 Stunden gültig.\n\nFalls du diese E-Mail nicht angefordert hast, kannst du sie einfach ignorieren.`;
 
-  await transport.sendMail({
-    to: email,
-    from: provider.from,
-    subject: "🌱 Dein Login-Link für Schule des Lebens",
-    html,
-    text,
-  });
+    const result = await transport.sendMail({
+      to: email,
+      from: provider.from,
+      subject: "🌱 Dein Login-Link für Schule des Lebens",
+      html,
+      text,
+    });
+    console.log("[AUTH] Email sent successfully:", result.messageId);
+  } catch (error) {
+    console.error("[AUTH] Failed to send email:", error);
+    throw error;
+  }
 }
 
 export const authOptions: NextAuthOptions = {
